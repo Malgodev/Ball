@@ -7,6 +7,7 @@ public class GameSingleton : MonoBehaviour
 {
     public static GameSingleton Instance { get; private set; }
 
+    public TeamController.TeamController teamController { get; private set; }
 
     public float CurrentFPS;
     
@@ -22,6 +23,8 @@ public class GameSingleton : MonoBehaviour
         {
             Instance = this;
         }
+
+        teamController = GetComponent<TeamController.TeamController>();
     }
 
     private void Update()
