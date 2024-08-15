@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        formationRectangle = GameSingleton.Instance.teamController.formationMovement;
+        formationRectangle = GameSingleton.Instance.teamController.formationRectangle;
     }
 
     void Start()
@@ -41,9 +41,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Vector3 defaultPos = new Vector3(formationRectangle.centerX, formationRectangle.centerY, 0);
-            defaultPos.x += (this.DefaultOffset.x * formationRectangle.width / 2);
-            defaultPos.y += (this.DefaultOffset.y * formationRectangle.height / 2 - (formationRectangle.height / 2));
+            Vector3 defaultPos = formationRectangle.GetWorldPositionByOffset(this.DefaultOffset);
 
             transform.position = defaultPos;
         }

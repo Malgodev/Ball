@@ -7,6 +7,10 @@ namespace TeamController
 {
     public class FormationRectangle
     {
+        // Should rewrite to make this class base on GameObject rather than float value
+        
+        public GameObject square { get; private set; }
+
         // center X, Y allow team to move for defense and attack option
         public float centerX { get; private set; }
         public float centerY { get; private set; }
@@ -15,12 +19,28 @@ namespace TeamController
         public float width { get; private set; }
         public float height { get; private set; }
 
-       public FormationRectangle(float centerX, float centerY, float width, float height)
-        {
+        // ratio between w,h and square scale
+        private float ratio;
+
+       public FormationRectangle(GameObject square, float centerX, float centerY, float width, float height)
+       {
+            this.square = square;
             this.centerX = centerX;
             this.centerY = centerY;
             this.width = width;
             this.height = height;
+
+            ratio = square.transform.localScale.x / width;
+       }
+
+        public Vector3 GetWorldPositionByOffset(Vector3 offset)
+        {
+            Vector2 result = Vector2.zero;
+
+            result.x = centerX + (offset.x / 100 * width * ratio) - width * ratio / 2;
+            result.y = centerY + (offset.y / 100 * height * ratio) - height * ratio / 2;
+
+            return result;
         }
     }
 
@@ -28,7 +48,7 @@ namespace TeamController
     {
         [SerializeField] EFormation formation;
 
-        [SerializeField] public FormationRectangle formationMovement { get; private set; }
+        [SerializeField] public FormationRectangle formationRectangle { get; private set; }
 
         [SerializeField] GameObject PlayerPrefab;
 
@@ -38,7 +58,7 @@ namespace TeamController
 
         private void Awake()
         {
-            formationMovement = new FormationRectangle(-15f, 0f, 50f, 60f);
+            formationRectangle = new FormationRectangle(Square, -15f, 0f, 100f, 100f);
 
             PlayerList = new List<GameObject>();
 
@@ -68,8 +88,8 @@ namespace TeamController
         void Update()
         {
 #if UNITY_EDITOR
-            Square.transform.position = new Vector3(formationMovement.centerX, formationMovement.centerY, 0f);
-            Square.transform.localScale = new Vector3(formationMovement.width, formationMovement.height, 1f);
+            Square.transform.position = new Vector3(formationRectangle.centerX, formationRectangle.centerY, 0f);
+            Square.transform.localScale.Scale(new Vector3(formationRectangle.width / 100, formationRectangle.height / 100, 1f));
 #endif
         }
 
@@ -134,23 +154,23 @@ namespace TeamController
                 {
                     case EPlayerRole.Goalkeeper:
 
-                        PlayerList.Add(CreatePlayer(role, new Vector2(-2, 0), numberOfDefender, delta));
+                        PlayerList.Add(CreatePlayer(role, new Vector2(0, 0), numberOfDefender, delta));
                         break;
 
                     case EPlayerRole.Fullback:
-                        PlayerList.Add(CreatePlayer(role, new Vector2(-1, 0), numberOfDefender, delta));
+                        PlayerList.Add(CreatePlayer(role, new Vector2(25, 0), numberOfDefender, delta));
                         break;
 
                     case EPlayerRole.Midfielder:
-                        PlayerList.Add(CreatePlayer(role, new Vector2(0, 0), numberOfMidfield, delta));
+                        PlayerList.Add(CreatePlayer(role, new Vector2(50, 0), numberOfMidfield, delta));
                         break;
 
                     case EPlayerRole.Striker:
-                        PlayerList.Add(CreatePlayer(role, new Vector2(1, 0), numberOfFrontline, delta));
+                        PlayerList.Add(CreatePlayer(role, new Vector2(80, 0), numberOfFrontline, delta));
                         break;
 
                     case EPlayerRole.Winger:
-                        PlayerList.Add(CreatePlayer(role, new Vector2(0.5f, 0), numberOfFrontline, delta));
+                        PlayerList.Add(CreatePlayer(role, new Vector2(70, 0), numberOfFrontline, delta));
                         break;
 
                 }
@@ -185,7 +205,8 @@ namespace TeamController
             PlayerController playerController = newPlayer.GetComponent<PlayerController>();
             playerController.SetRole(role);
 
-            offset.y = numberOfRolePlayer - delta - Mathf.Ceil(numberOfRolePlayer / 2);
+
+            offset.y = (delta + 0.5f) * (formationRectangle.height / numberOfRolePlayer);
             playerController.SetDefaultOffset(offset);
 
             return newPlayer;
