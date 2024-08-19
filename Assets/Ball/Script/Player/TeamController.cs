@@ -176,29 +176,11 @@ namespace TeamController
                 }
             }
 
-            /*            GameObject newPlayer = Instantiate(PlayerPrefab, Vector3.zero, Quaternion.identity); 
-                        newPlayer.GetComponent<PlayerController>().SetRole(playerRole);
-
-                        foreach (GameObject player in PlayerList)
-                        {
-                            if (player.GetComponent<PlayerController>().role == playerRole)
-                            {
-                                Debug.Log("Player already exist");
-                                return null;
-                            }
-                        }*/
+            // TO DO: Add check to make sure there is only 1 ball owner at a time
+            PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>().SetIsBallOwner(true);
 
         }
 
-/*                            case EPlayerRole.Goalkeeper:
-                        newPlayer = Instantiate(PlayerPrefab);
-        playerController = newPlayer.GetComponent<PlayerController>();
-
-                        playerController.SetRole(role);
-                        playerController.SetDefaultOffset(new Vector2(-2f, 0f));
-
-                        PlayerList.Add(newPlayer);
-                        break;*/
         GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
         {
             GameObject newPlayer = Instantiate(PlayerPrefab);

@@ -36,7 +36,7 @@ public class BallMovement : MonoBehaviour
     {
 
 
-        if (Input.GetMouseButtonDown(0)) 
+/*        if (Input.GetMouseButtonDown(0)) 
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
@@ -52,9 +52,9 @@ public class BallMovement : MonoBehaviour
             float Force = Vector3.Distance(initTransform, mousePos) * -20;
 
             AddForce(Force, (mousePos - initTransform).normalized);
-        }
+        }*/
 
-        if (PredictPos.Count > 0)
+/*        if (PredictPos.Count > 0)
         {
             PredictPos.RemoveAt(0);
             PredictPos.Add(LastPredictionPos(rb.velocity));
@@ -63,7 +63,7 @@ public class BallMovement : MonoBehaviour
         else if (PredictPos.Count == 0 && rb.velocity != Vector2.zero)
         {
             PredictPos = GenPredictionPos(rb.velocity);
-        }
+        }*/
     }
 
     private void AddForce(float Force, Vector3 Direction)
