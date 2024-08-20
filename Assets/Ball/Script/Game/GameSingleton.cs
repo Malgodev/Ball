@@ -10,7 +10,10 @@ public class GameSingleton : MonoBehaviour
     public TeamController.TeamController teamController { get; private set; }
 
     public float CurrentFPS;
+
+    [field: SerializeField] public GameObject ball { get; private set; }
     
+
     private void Awake()
     {
         Application.targetFrameRate = 60;

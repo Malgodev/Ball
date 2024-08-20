@@ -122,6 +122,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &26431127 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6898010065699366121, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
+  m_PrefabInstance: {fileID: 3457146534606612249}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &268465450
 GameObject:
   m_ObjectHideFlags: 0
@@ -934,6 +939,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CurrentFPS: 0
+  <ball>k__BackingField: {fileID: 26431127}
 --- !u!114 &2069046386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1129,6 +1135,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SoccerBall
       objectReference: {fileID: 0}
+    - target: {fileID: 8054418111356444948, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
+      propertyPath: m_Constraints
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8795650602875553323, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.68
@@ -1139,7 +1149,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8795650602875553323, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.0069497186
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8795650602875553323, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
       propertyPath: m_LocalRotation.w

@@ -12,8 +12,13 @@ public class PlayerController : MonoBehaviour
 
     private FormationRectangle formationRectangle;
 
+    [SerializeField] private bool isControlled = false;
     [SerializeField] private bool isBallOwner = false;
 
+
+/*     IEnumerator DribblingBall;*/
+
+    // Movement
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private Rigidbody2D rb;
 
@@ -24,45 +29,6 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
 
         formationRectangle = GameSingleton.Instance.teamController.formationRectangle;
-    }
-
-    void Start()
-    {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (isBallOwner)
-        {
-            UserControl();
-        }
-        else
-        {
-
-        }
-    }
-
-
-    private void UserControl()
-    {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
-    }
-
-
-    private void FixedUpdate()
-    {
-        if (isBallOwner)
-        {
-            rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
-            Debug.Log(movement);
-        }
-    }
-
-    public void SetRole(EPlayerRole role)
-    {
-        this.role = role;
     }
 
     public void SetDefaultOffset(Vector2 DefaultOffset)
@@ -84,8 +50,69 @@ public class PlayerController : MonoBehaviour
         // E.g: Defender will strict together more than midfielder
     }
 
-    public void SetIsBallOwner(bool IsBallOwner)
+    void Start()
     {
-        this.isBallOwner = IsBallOwner;
+        StartCoroutine(DribblingBall());
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (isControlled)
+        {
+            UserControl();
+        }
+        else
+        {
+
+        }
+
+    }
+
+    private void UserControl()
+    {
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
+    }
+    private void FixedUpdate()
+    {
+        if (isControlled)
+        {
+            rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+        }
+    }
+
+    IEnumerator DribblingBall()
+    {
+        // TODO Change ball object logic
+        GameObject ballObject = GameSingleton.Instance.ball;
+        BallMovement ballMovement = ballObject.GetComponent<BallMovement>();
+
+        ballObject.transform.position = new Vector2(transform.position.x, transform.position.y);
+
+        ballObject.transform.position += transform.forward * 1f;
+
+        ballMovement.StopForce();
+
+       while (isBallOwner)
+       {
+            float PlayerVelocity = rb.velocity.magnitude;
+            Vector2 PlayerDirection = rb.velocity.normalized;
+
+            ballMovement.AddForce(PlayerVelocity, PlayerDirection);
+            yield return null;
+       }
+    }
+
+
+    public void SetRole(EPlayerRole role)
+    {
+        this.role = role;
+    }
+
+
+    public void SetIsControlled(bool IsBallOwner)
+    {
+        this.isControlled = IsBallOwner;
     }
 }

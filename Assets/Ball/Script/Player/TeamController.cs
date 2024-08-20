@@ -47,7 +47,6 @@ namespace TeamController
     public class TeamController : MonoBehaviour
     {
         [SerializeField] EFormation formation;
-
         [SerializeField] public FormationRectangle formationRectangle { get; private set; }
 
         [SerializeField] GameObject PlayerPrefab;
@@ -177,7 +176,7 @@ namespace TeamController
             }
 
             // TO DO: Add check to make sure there is only 1 ball owner at a time
-            PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>().SetIsBallOwner(true);
+            PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>().SetIsControlled(true);
 
         }
 

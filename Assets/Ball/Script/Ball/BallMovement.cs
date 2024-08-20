@@ -19,6 +19,7 @@ public class BallMovement : MonoBehaviour
     private Vector3 initTransform;
     private int PredictFrameCount = 120;
 
+    public bool isDribbling = false;
 
     private void Awake()
     {
@@ -66,9 +67,14 @@ public class BallMovement : MonoBehaviour
         }*/
     }
 
-    private void AddForce(float Force, Vector3 Direction)
+    public void AddForce(float Force, Vector3 Direction)
     {
         rb.AddForce(Direction * Force);
+    }
+
+    public void StopForce()
+    {
+        rb.velocity = Vector2.zero;
     }
 
     List<Vector3> GenPredictionPos(Vector3 Velocity)
