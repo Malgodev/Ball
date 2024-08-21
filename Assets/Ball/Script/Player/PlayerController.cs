@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private Rigidbody2D rb;
 
+    GameObject ballObject = null;
+
     Vector2 movement;
 
     private void Awake()
@@ -52,6 +54,8 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        ballObject = GameSingleton.Instance.ball;
+
         StartCoroutine(DribblingBall());
     }
 
@@ -73,6 +77,11 @@ public class PlayerController : MonoBehaviour
     {
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
+
+        if (Input.GetKeyDown(KeyCode.J)) 
+        {
+            ShotBall();
+        }
     }
     private void FixedUpdate()
     {
@@ -91,7 +100,6 @@ public class PlayerController : MonoBehaviour
     IEnumerator DribblingBall()
     {
         // TODO Change ball object logic
-        GameObject ballObject = GameSingleton.Instance.ball;
         BallMovement ballMovement = ballObject.GetComponent<BallMovement>();
 
         while (isBallOwner)
@@ -104,6 +112,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void ShotBall()
+    {
+        // TODO Code to check how long the key has pressed -> convert to force
+
+        isBallOwner = false;
+
+        ballObject.GetComponent<BallMovement>().AddForce(100f, transform.right);
+    }
 
     public void SetRole(EPlayerRole role)
     {
