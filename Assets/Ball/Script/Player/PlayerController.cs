@@ -78,6 +78,12 @@ public class PlayerController : MonoBehaviour
     {
         if (isControlled)
         {
+
+            if (movement != Vector2.zero)
+            {
+                transform.rotation = Quaternion.Euler(0, 0, -Vector2.SignedAngle(movement.normalized, Vector2.right));
+            }
+
             rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
         }
     }
@@ -88,20 +94,14 @@ public class PlayerController : MonoBehaviour
         GameObject ballObject = GameSingleton.Instance.ball;
         BallMovement ballMovement = ballObject.GetComponent<BallMovement>();
 
-        ballObject.transform.position = new Vector2(transform.position.x, transform.position.y);
-
-        ballObject.transform.position += transform.forward * 1f;
-
-        ballMovement.StopForce();
-
-       while (isBallOwner)
-       {
-            float PlayerVelocity = rb.velocity.magnitude;
-            Vector2 PlayerDirection = rb.velocity.normalized;
-
-            ballMovement.AddForce(PlayerVelocity, PlayerDirection);
+        while (isBallOwner)
+        {
+            Vector3 BallPos = transform.position;
+            BallPos += transform.right * 1f;
+            ballObject.transform.position = new Vector2(BallPos.x, BallPos.y);
+            ballMovement.StopForce();
             yield return null;
-       }
+        }
     }
 
 
@@ -111,8 +111,13 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    public void SetIsControlled(bool IsBallOwner)
+    public void SetIsControlled(bool isControlled)
     {
-        this.isControlled = IsBallOwner;
+        this.isControlled = isControlled;
+    }
+
+    public void SetIsBallOwner(bool isBallOwner)
+    {
+        this.isBallOwner = isBallOwner;
     }
 }

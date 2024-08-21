@@ -175,9 +175,10 @@ namespace TeamController
                 }
             }
 
-            // TO DO: Add check to make sure there is only 1 ball owner at a time
+            // TODO Add check to make sure there is only 1 ball owner at a time
             PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>().SetIsControlled(true);
 
+            PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>().SetIsBallOwner(true);
         }
 
         GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
