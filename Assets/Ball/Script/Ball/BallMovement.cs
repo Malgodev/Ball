@@ -75,6 +75,7 @@ public class BallMovement : MonoBehaviour
     public void StopForce()
     {
         rb.velocity = Vector2.zero;
+        // ?
     }
 
     List<Vector3> GenPredictionPos(Vector3 Velocity)
