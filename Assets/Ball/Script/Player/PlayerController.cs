@@ -15,9 +15,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool isControlled = false;
     [SerializeField] private bool isBallOwner = false;
 
-
-/*     IEnumerator DribblingBall;*/
-
     // Movement
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private Rigidbody2D rb;
@@ -98,7 +95,7 @@ public class PlayerController : MonoBehaviour
 
     IEnumerator DribblingBall()
     {
-        // TODO Change ball object logic
+        // TODO Change ball object logic, not stick to player -> ball will be kicked away and repeat
         BallMovement ballMovement = ballObject.GetComponent<BallMovement>();
 
         while (isBallOwner)
@@ -107,6 +104,7 @@ public class PlayerController : MonoBehaviour
             BallPos += transform.right * 1f;
             ballObject.transform.position = new Vector2(BallPos.x, BallPos.y);
             ballMovement.StopForce();
+
             yield return null;
         }
     }

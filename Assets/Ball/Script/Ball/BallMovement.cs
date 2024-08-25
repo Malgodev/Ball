@@ -20,8 +20,6 @@ public class BallMovement : MonoBehaviour
     private Vector3 initTransform;
     private int PredictFrameCount = 120;
 
-    public bool isDribbling = false;
-
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();

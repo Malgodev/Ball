@@ -11,7 +11,7 @@ public enum EPlayerRole
     Striker,
 }
 
-enum EFormation
+public enum EFormation
 {
     Formation_3_3_2,
 }

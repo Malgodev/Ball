@@ -7,12 +7,14 @@ public class GameSingleton : MonoBehaviour
 {
     public static GameSingleton Instance { get; private set; }
 
-    public TeamController.TeamController teamController { get; private set; }
-
     public float CurrentFPS;
 
+    public TeamController.TeamController teamController { get; private set; }
+
     [field: SerializeField] public GameObject ball { get; private set; }
-    
+
+    [field: SerializeField] public EFormation playerOneFormation { get; private set; }
+    [field: SerializeField] public EFormation playerTwoFormation { get; private set; }
 
     private void Awake()
     {
@@ -28,6 +30,13 @@ public class GameSingleton : MonoBehaviour
         }
 
         teamController = GetComponent<TeamController.TeamController>();
+
+        GeneratePlayer.GeneratePlayerByFormation(playerOneFormation);
+    }
+
+    private void Start()
+    {
+        
     }
 
     private void Update()
