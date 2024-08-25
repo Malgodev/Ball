@@ -70,7 +70,6 @@ public class PlayerController : MonoBehaviour
         {
 
         }
-
     }
 
     private void UserControl()
@@ -121,11 +120,19 @@ public class PlayerController : MonoBehaviour
         ballObject.GetComponent<BallMovement>().AddForce(100f, transform.right);
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag(BallMovement.BallTag))
+        {
+            isBallOwner = true;
+            StartCoroutine(DribblingBall());
+        }
+    }
+
     public void SetRole(EPlayerRole role)
     {
         this.role = role;
     }
-
 
     public void SetIsControlled(bool isControlled)
     {

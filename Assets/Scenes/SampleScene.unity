@@ -1135,6 +1135,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SoccerBall
       objectReference: {fileID: 0}
+    - target: {fileID: 6898010065699366121, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
+      propertyPath: m_TagString
+      value: Ball
+      objectReference: {fileID: 0}
     - target: {fileID: 8054418111356444948, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
       propertyPath: m_Constraints
       value: 0

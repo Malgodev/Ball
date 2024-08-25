@@ -14,6 +14,7 @@ public class BallMovement : MonoBehaviour
     [SerializeField] private GameObject BallPrefab;
     [SerializeField] private Rigidbody2D rb;
 
+    public static string BallTag = "Ball";
 
     private List<Vector3> PredictPos;
     private Vector3 initTransform;
