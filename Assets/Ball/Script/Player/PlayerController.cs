@@ -11,9 +11,14 @@ public class PlayerController : MonoBehaviour
 
     // Movement
     [SerializeField] private float moveSpeed = 5f;
+
     public Rigidbody2D rb { get; private set; }
 
     private GameObject ball;
+
+    UserInput userInput;
+
+    public IEnumerator dribblingBall { get; private set; }
 
     private void Awake()
     {
@@ -31,7 +36,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-
+        dribblingBall = DribblingBall();
     }
 
     // Update is called once per frame
@@ -44,12 +49,19 @@ public class PlayerController : MonoBehaviour
     {
         // TODO Change ball object logic, not stick to player -> ball will be kicked away and repeat
 
-        while (GameController.Instance.PlayerHasBall.Equals(this))
+        PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
+
+
+        while (playerHasBall && playerHasBall.Equals(this))
         {
+            playerHasBall = GameController.Instance.PlayerHasBall;
+
             Vector3 BallPos = transform.position;
             BallPos += transform.right * 1f;
             ball.transform.position = new Vector3(BallPos.x, BallPos.y, -1);
             ball.GetComponent<BallMovement>().StopForce();
+
+            // Debug.Log((playerHasBall == null).ToString() + " " + playerHasBall.Equals(this));
 
             yield return null;
         }
@@ -59,16 +71,16 @@ public class PlayerController : MonoBehaviour
     public void ShotBall(GameObject ball)
     {
         // TODO Code to check how long the key has pressed -> convert to force
-        // TODO Call team controller (game controller) to change ball owner
 
-         ball.GetComponent<BallMovement>().AddForce(100f, transform.right);
+        GameController.Instance.SetPlayerHasBall(null);
+
+        ball.GetComponent<BallMovement>().AddForce(100f, transform.right);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag(BallMovement.BallTag))
         {
-            // TODO Call team controller (game controller) to change ball owner
             GameController.Instance.SetPlayerHasBall(this);
         }
     }

@@ -3,23 +3,31 @@ using UnityEngine;
 
 public class UserInput : MonoBehaviour
 {
-    public Vector2 inputVector { get; private set; }
+    private PlayerController controlledPlayer;
 
-    public event Action OnShotBall;
+    public Vector2 inputVector { get; private set; }
 
     private void Awake()
     {
+        controlledPlayer = null;
+
         inputVector = Vector2.zero;
     }
 
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (controlledPlayer == null)
+        {
+            return;
+        }
+
+
         inputVector = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
         if (Input.GetKeyDown(KeyCode.J))
@@ -28,13 +36,26 @@ public class UserInput : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        if (controlledPlayer == null)
+        {
+            return;
+        }
+
+        controlledPlayer.MoveToPositionByAxis(inputVector);
+    }
+
     public void ShotBall()
     {
-        OnShotBall?.Invoke();
-        // TODO Code to check how long the key has pressed -> convert to force
+        if (controlledPlayer == GameController.Instance.PlayerHasBall)
+        {
+            controlledPlayer.ShotBall(GameController.Instance.ball);
+        }
+    }
 
-        /*        isBallOwner = false;
-
-                ballObject.GetComponent<BallMovement>().AddForce(100f, transform.right);*/
+    public void SetControlledPlayer(PlayerController playerController)
+    {
+        controlledPlayer = playerController;
     }
 }
