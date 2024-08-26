@@ -1,16 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TeamController;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     public EPlayerRole role { get; private set; }
-
+    
+    // The position of player in formation rectangle
     public Vector2 defaultOffset { get; private set; } // offset from the center of the formation
 
-    private FormationRectangle formationRectangle;
+    private FormationController formationRectangle;
 
     [SerializeField] private bool isControlled = false;
     [SerializeField] private bool isBallOwner = false;
@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
 
-        formationRectangle = GameSingleton.Instance.teamController.formationRectangle;
+        // formationRectangle = GameSingleton.Instance.teamController.formationRectangle;
     }
 
     public void SetDefaultOffset(Vector2 DefaultOffset)
@@ -40,9 +40,9 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            Vector3 defaultPos = formationRectangle.GetWorldPositionByOffset(this.defaultOffset);
+            // Vector3 defaultPos = formationRectangle.GetWorldPositionByOffset(this.defaultOffset);
 
-            transform.position = defaultPos;
+            // transform.position = defaultPos;
         }
 
         // TO DO: Set the player position more dynamic
@@ -125,6 +125,11 @@ public class PlayerController : MonoBehaviour
             isBallOwner = true;
             StartCoroutine(DribblingBall());
         }
+    }
+
+    public void SetPosition(Vector2 targetPos)
+    {
+        transform.position = targetPos;
     }
 
     public void SetRole(EPlayerRole role)

@@ -6,27 +6,28 @@ public class GeneratePlayer : MonoBehaviour
 {
     [SerializeField] private static GameObject playerPrefab;
 
-    public static List<PlayerController> GeneratePlayerByFormation(EFormation formation)
+    // Generate player by TeamController
+    // @param the team that want to generate
+    public static void GeneratePlayerByTeam(TeamController teamController)
     {
-        /*        switch (formation)
-                {
-                    case EFormation.Formation_3_3_2:
-                        CreateFormation(Formation.Formation_3_3_2);
-                        break;
+        EFormation formation = teamController.formation;
+        switch (formation)
+        {
+            case EFormation.Formation_3_3_2:
+                teamController.SetPlayerList(CreateFormation(Formation.Formation_3_3_2));
+                break;
 
-                    default:
-                        Debug.Log("Formation invalid");
-                        break;
-                }*/
-
-        Debug.Log("Spawn yay");
-
-        return null;
+            default:
+                Debug.Log("Formation invalid");
+                break;
+        }
     }
 
-    void CreateFormation(List<EPlayerRole> playerRole)
+    static List<GameObject> CreateFormation(List<EPlayerRole> playerRole)
     {
-        PlayerController playerList = new List<PlayerController>();
+        List<GameObject> playerList = new List<GameObject>();
+
+        // TODO Rewrite algothrim
 
         int numberOfFrontline = 0;
         int numberOfMidfield = 0;
@@ -82,7 +83,7 @@ public class GeneratePlayer : MonoBehaviour
             {
                 // TODO Change hard code
                 case EPlayerRole.Goalkeeper:
-                    playerList.Add(CreatePlayer(role, new Vector2(0, 0), numberOfDefender, delta));
+                    playerList.Add(CreatePlayer(role, new Vector2(0, 0), 1, 0));
                     break;
 
                 case EPlayerRole.Fullback:
@@ -100,25 +101,20 @@ public class GeneratePlayer : MonoBehaviour
                 case EPlayerRole.Winger:
                     playerList.Add(CreatePlayer(role, new Vector2(70, 0), numberOfFrontline, delta));
                     break;
-
             }
         }
 
-        // TODO Add check to make sure there is only 1 ball owner at a time
-/*#if UNITY_EDITOR
-        playerList[playerList.Count - 1].GetComponent<PlayerController>().SetIsControlled(true);
-
-        SetPlayerHasBall(playerList[playerList.Count - 1].GetComponent<PlayerController>());
-#endif*/
+        return playerList;
+        
     }
 
-    GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
+    static GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
     {
-        GameObject newPlayer = Instantiate(playerPrefab);
+        GameObject newPlayer = Instantiate(GameSingleton.Instance.playerPrefab);
         PlayerController playerController = newPlayer.GetComponent<PlayerController>();
         playerController.SetRole(role);
 
-        offset.y = (delta + 0.5f) * (formationRectangle.height / numberOfRolePlayer);
+        offset.y = (delta + 1) * (100 / (numberOfRolePlayer + 1));
         playerController.SetDefaultOffset(offset);
 
         return newPlayer;

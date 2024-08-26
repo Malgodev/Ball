@@ -9,12 +9,13 @@ public class GameSingleton : MonoBehaviour
 
     public float CurrentFPS;
 
-    public TeamController.TeamController teamController { get; private set; }
-
     [field: SerializeField] public GameObject ball { get; private set; }
+    [field: SerializeField] public GameObject playerPrefab { get; private set; }
 
-    [field: SerializeField] public EFormation playerOneFormation { get; private set; }
-    [field: SerializeField] public EFormation playerTwoFormation { get; private set; }
+    [field: SerializeField] public TeamController teamOneController { get; private set; }
+    [field: SerializeField] public TeamController teamTwoController { get; private set; }
+
+    public PlayerController PlayerHasBall { get; private set; }
 
     private void Awake()
     {
@@ -29,18 +30,22 @@ public class GameSingleton : MonoBehaviour
             Instance = this;
         }
 
-        teamController = GetComponent<TeamController.TeamController>();
+        // teamTwoController = GetComponent<TeamController>();
 
-        GeneratePlayer.GeneratePlayerByFormation(playerOneFormation);
     }
 
     private void Start()
     {
-        
+        GeneratePlayer.GeneratePlayerByTeam(teamOneController);
     }
 
     private void Update()
     {
         CurrentFPS = 1.0f / Time.deltaTime;
+    }
+
+    public void SetPlayerHasBall(PlayerController player)
+    {
+        PlayerHasBall = player;
     }
 }
