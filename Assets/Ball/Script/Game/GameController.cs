@@ -1,11 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class GameSingleton : MonoBehaviour
+public class GameController : MonoBehaviour
 {
-    public static GameSingleton Instance { get; private set; }
+    public static GameController Instance { get; private set; }
 
     public float CurrentFPS;
 
@@ -31,7 +28,6 @@ public class GameSingleton : MonoBehaviour
         }
 
         // teamTwoController = GetComponent<TeamController>();
-
     }
 
     private void Start()
@@ -44,8 +40,14 @@ public class GameSingleton : MonoBehaviour
         CurrentFPS = 1.0f / Time.deltaTime;
     }
 
+
     public void SetPlayerHasBall(PlayerController player)
     {
         PlayerHasBall = player;
+
+        if (PlayerHasBall != null)
+        {
+            StartCoroutine(PlayerHasBall.DribblingBall());
+        }
     }
 }

@@ -1,10 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GeneratePlayer : MonoBehaviour
 {
-    [SerializeField] private static GameObject playerPrefab;
+    // [SerializeField] private static GameObject playerPrefab;
 
     // Generate player by TeamController
     // @param the team that want to generate
@@ -27,7 +26,7 @@ public class GeneratePlayer : MonoBehaviour
     {
         List<GameObject> playerList = new List<GameObject>();
 
-        // TODO Rewrite algothrim
+        // TODO Rewrite algothrim, maybe factory design pattern
 
         int numberOfFrontline = 0;
         int numberOfMidfield = 0;
@@ -112,7 +111,7 @@ public class GeneratePlayer : MonoBehaviour
 
     static GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
     {
-        GameObject newPlayer = Instantiate(GameSingleton.Instance.playerPrefab);
+        GameObject newPlayer = Instantiate(GameController.Instance.playerPrefab);
         PlayerController playerController = newPlayer.GetComponent<PlayerController>();
         playerController.SetRole(role);
 

@@ -1,12 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
 
 [Serializable]
 public class TeamController : MonoBehaviour
 {
+    private GameObject ball;
+
     [field: SerializeField] public EFormation formation { get; private set; }
     [field: SerializeField] public FormationController formationController { get; private set; }
 
@@ -21,6 +21,13 @@ public class TeamController : MonoBehaviour
         PlayerList = new List<GameObject>();
 
         userInput = GetComponent<UserInput>();
+
+        userInput.OnShotBall += ShotBall;
+    }
+
+    private void Start()
+    {
+        ball = GameController.Instance.ball;
     }
 
     void Update()
@@ -34,8 +41,14 @@ public class TeamController : MonoBehaviour
         {
             // ControlledPlayer.MoveToPosition();
             ControlledPlayer.MoveToPositionByAxis(userInput.inputVector);
-            Debug.Log(userInput.inputVector);
         }
+    }
+
+    private void ShotBall()
+    {
+        // wtf is this code?
+        // Shoud I covert this to singletone
+        GameController.Instance.PlayerHasBall.ShotBall(ball);
     }
 
     public void SetPlayerIsControlled(PlayerController player)
@@ -51,6 +64,10 @@ public class TeamController : MonoBehaviour
         {
             PlayerController playerController = player.GetComponent<PlayerController>();
 
+            player.transform.parent = this.transform;
+
+            player.name = playerController.role.ToString() + " " + PlayerList.IndexOf(player);
+            
             Vector2 newPos = formationController.GetWorldPositionByOffset(playerController.defaultOffset);
 
             playerController.SetPosition(newPos);

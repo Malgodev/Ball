@@ -383,6 +383,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55a80879144cab447858b587ac1b6648, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameController: {fileID: 0}
+  ball: {fileID: 0}
   <formation>k__BackingField: 0
   <formationController>k__BackingField: {fileID: 967645098}
 --- !u!4 &802361750
@@ -1194,7 +1196,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8795650602875553323, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 8795650602875553323, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
       propertyPath: m_LocalRotation.w

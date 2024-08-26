@@ -1,10 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class UserInput : MonoBehaviour
 {
     public Vector2 inputVector { get; private set; }
+
+    public event Action OnShotBall;
 
     private void Awake()
     {
@@ -29,10 +30,11 @@ public class UserInput : MonoBehaviour
 
     public void ShotBall()
     {
+        OnShotBall?.Invoke();
         // TODO Code to check how long the key has pressed -> convert to force
 
-/*        isBallOwner = false;
+        /*        isBallOwner = false;
 
-        ballObject.GetComponent<BallMovement>().AddForce(100f, transform.right);*/
+                ballObject.GetComponent<BallMovement>().AddForce(100f, transform.right);*/
     }
 }
