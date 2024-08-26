@@ -10,6 +10,8 @@ public class TeamController : MonoBehaviour
     [field: SerializeField] public EFormation formation { get; private set; }
     [field: SerializeField] public FormationController formationController { get; private set; }
 
+    private UserInput userInput;
+
     List<GameObject> PlayerList;
 
     public PlayerController ControlledPlayer { get; private set; }
@@ -17,11 +19,8 @@ public class TeamController : MonoBehaviour
     private void Awake()
     {
         PlayerList = new List<GameObject>();
-    }
 
-    void Start()
-    {
-
+        userInput = GetComponent<UserInput>();
     }
 
     void Update()
@@ -29,16 +28,19 @@ public class TeamController : MonoBehaviour
         
     }
 
-    public bool SetPlayerIsControlled(PlayerController player)
+    private void FixedUpdate()
     {
-        if (ControlledPlayer != null)
+        if (ControlledPlayer != null && userInput != null)
         {
-            ControlledPlayer.SetIsControlled(false);
+            // ControlledPlayer.MoveToPosition();
+            ControlledPlayer.MoveToPositionByAxis(userInput.inputVector);
+            Debug.Log(userInput.inputVector);
         }
+    }
 
+    public void SetPlayerIsControlled(PlayerController player)
+    {
         ControlledPlayer = player;
-        ControlledPlayer.SetIsControlled(true);
-        return true;
     }
 
     public void SetPlayerList(List<GameObject> targetPlayerList)
@@ -52,8 +54,8 @@ public class TeamController : MonoBehaviour
             Vector2 newPos = formationController.GetWorldPositionByOffset(playerController.defaultOffset);
 
             playerController.SetPosition(newPos);
-
-            Debug.Log(newPos);
         }
+
+        SetPlayerIsControlled(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
     }
 }

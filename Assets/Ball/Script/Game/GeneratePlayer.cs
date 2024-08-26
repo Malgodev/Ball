@@ -82,6 +82,8 @@ public class GeneratePlayer : MonoBehaviour
             switch (role)
             {
                 // TODO Change hard code
+                // TO DO: Set the player position more dynamic
+                // E.g: Defender will strict together more than midfielder
                 case EPlayerRole.Goalkeeper:
                     playerList.Add(CreatePlayer(role, new Vector2(0, 0), 1, 0));
                     break;
