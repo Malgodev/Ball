@@ -28,6 +28,23 @@ public class TeamController : MonoBehaviour
         ball = GameController.Instance.ball;
     }
 
+    private void Update()
+    {
+        foreach (GameObject player in PlayerList)
+        {
+            PlayerController playerController = player.GetComponent<PlayerController>();
+
+            if (playerController == ControlledPlayer || playerController.role == EPlayerRole.Goalkeeper)
+            {
+                continue;
+            }
+
+            Vector2 targetPos = formationController.GetWorldPositionByOffset(playerController.defaultOffset);
+
+            playerController.MoveToPosition(targetPos);
+        }
+    }
+
     private void ShotBall()
     {
         // wtf is this code?

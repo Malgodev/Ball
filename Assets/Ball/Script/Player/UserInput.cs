@@ -43,7 +43,7 @@ public class UserInput : MonoBehaviour
             return;
         }
 
-        controlledPlayer.MoveToPositionByAxis(inputVector);
+        controlledPlayer.MoveByAxis(inputVector);
     }
 
     public void ShotBall()

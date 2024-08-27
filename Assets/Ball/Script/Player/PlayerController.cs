@@ -90,21 +90,55 @@ public class PlayerController : MonoBehaviour
         transform.position = targetPos;
     }
 
+    /// <summary>
+    /// Try to move player to that position, each time move by direction to that pos * move speed of player
+    /// </summary>
     public void MoveToPosition(Vector2 targetPos)
     {
+        if (targetPos.Equals((Vector2)transform.position))
+        {
+            return;
+        }
+
+        Vector2 direc = targetPos -  (Vector2) transform.position;
+
+        direc = direc.normalized;
+
+        transform.rotation = GetRotationByDirection(direc);
+
+        rb.MovePosition(rb.position + direc * moveSpeed * Time.fixedDeltaTime);
 
     }
 
-    public void MoveToPositionByAxis(Vector2 movement)
+    public void MoveByForce(Vector2 direction, float value)
     {
-        if (movement != Vector2.zero)
-        {
-            transform.rotation = Quaternion.Euler(0, 0, -Vector2.SignedAngle(movement.normalized, Vector2.right));
-        }
+        transform.rotation = GetRotationByDirection(direction);
+
+        rb.MovePosition(rb.position + direction * Mathf.Min(value, moveSpeed) * Time.fixedDeltaTime);
+    }
+
+    public void MoveByAxis(Vector2 movement)
+    {
+        transform.rotation = GetRotationByDirection(movement);
 
         rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
     }
 
+    public Quaternion GetRotationByDirection(Vector2 direction)
+    {
+        if (direction != Vector2.zero)
+        {
+            float angle = Vector2.SignedAngle(direction, Vector2.right);
+
+            angle = Mathf.Round(angle / 45.0f) * 45.0f;
+
+            return Quaternion.Euler(0, 0, -Vector2.SignedAngle(direction, Vector2.right));
+        }
+        else
+        {
+            return this.transform.rotation;
+        }
+    }
     public void SetRole(EPlayerRole role)
     {
         this.role = role;

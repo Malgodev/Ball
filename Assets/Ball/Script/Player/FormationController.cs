@@ -30,8 +30,13 @@ public class FormationController : MonoBehaviour
 
     private void Update()
     {
-        formationRectangle.position = formationPosition;
-        formationRectangle.localScale = formationScale;
+        /*        formationRectangle.position = formationPosition;
+                formationRectangle.localScale = formationScale;*/
+
+        formationPosition = formationRectangle.position;
+        formationScale = formationRectangle.localScale;
+
+
     }
 
     public void SetFormationPosition(Vector2 newPosition)
