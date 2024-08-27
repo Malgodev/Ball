@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void MoveToPosition(Vector2 targetPos)
     {
-        if (targetPos.Equals((Vector2)transform.position))
+        if (Vector2.Distance(targetPos, (Vector2) transform.position) < 0.1f)
         {
             return;
         }
