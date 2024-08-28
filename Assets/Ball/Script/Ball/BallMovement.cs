@@ -34,36 +34,14 @@ public class BallMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-
-/*        if (Input.GetMouseButtonDown(0)) 
+        if (rb.velocity.magnitude > 0)
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-            if (Physics2D.OverlapCircle(mousePos, 0.1f))
-            {
-                initTransform = mousePos;
-            }
+            PredictPos = GenPredictionPos(transform.position, rb.velocity);
         }
-
-        if (Input.GetMouseButtonUp(0))
+        else
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            float Force = Vector3.Distance(initTransform, mousePos) * -20;
-
-            AddForce(Force, (mousePos - initTransform).normalized);
-        }*/
-
-/*        if (PredictPos.Count > 0)
-        {
-            PredictPos.RemoveAt(0);
-            PredictPos.Add(LastPredictionPos(rb.velocity));
-
+            PredictPos.Clear();
         }
-        else if (PredictPos.Count == 0 && rb.velocity != Vector2.zero)
-        {
-            PredictPos = GenPredictionPos(rb.velocity);
-        }*/
     }
 
     public void AddForce(float Force, Vector3 Direction)
@@ -76,24 +54,26 @@ public class BallMovement : MonoBehaviour
         rb.velocity = Vector2.zero;
     }
 
-    List<Vector3> GenPredictionPos(Vector3 Velocity)
+    List<Vector3> GenPredictionPos(Vector3 position, Vector3 velocity)
     {
         List<Vector3> calculatedPos = new List<Vector3>();
 
-        Vector3 predictionPosition = transform.position;
-        Vector3 predictionVelocity = Velocity;
+        Vector3 curPos = transform.position;
+        Vector3 curVelocity = velocity;
+
 
         float deltaTime = Time.deltaTime;
 
         for (int i = 1; i <= PredictFrameCount; i++)
         {
-            predictionVelocity *= 1 - (0.4f * deltaTime);
+            Vector3 predictionVelocity = curVelocity * i * (1 - (rb.drag * deltaTime));
+            Vector3 predictionPosition = curPos + (i * deltaTime * predictionVelocity);
 
-            predictionPosition += predictionVelocity * deltaTime;
+            if (i % 5 == 0)
+            {
 
-            Instantiate(BallPrefab, predictionPosition, Quaternion.identity);
+            }
 
-            calculatedPos.Add(predictionPosition);
         }
 
         return calculatedPos;

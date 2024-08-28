@@ -74,7 +74,7 @@ public class PlayerController : MonoBehaviour
 
         GameController.Instance.SetPlayerHasBall(null);
 
-        ball.GetComponent<BallMovement>().AddForce(100f, transform.right);
+        ball.GetComponent<BallMovement>().AddForce(500f, transform.right);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

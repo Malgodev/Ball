@@ -12,9 +12,9 @@ public class FormationController : MonoBehaviour
 
     private void Awake()
     {
-#if UNITY_EDITOR
-        this.GetComponent<SpriteRenderer>().enabled = true;
-#endif
+//#if UNITY_EDITOR
+//        this.GetComponent<SpriteRenderer>().enabled = true;
+//#endif
 
         formationRectangle = transform;
 
@@ -58,5 +58,12 @@ public class FormationController : MonoBehaviour
         result.y = formationPosition.y + (offset.y / 100 * formationScale.y) - formationScale.y / 2;
 
         return result;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(1, 1, 1, 0.1f);
+        GizmosExtra.DrawWireRectangle(formationPosition, formationScale.x, formationScale.y, Color.white);
+
     }
 }
