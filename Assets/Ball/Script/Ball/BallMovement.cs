@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -34,12 +35,16 @@ public class BallMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (rb.velocity.magnitude > 0)
+        if (rb.velocity.magnitude > 0 && PredictPos.Count == 0)
         {
-            PredictPos = GenPredictionPos(transform.position, rb.velocity);
+            PredictPos = GenPredictionPos(rb.velocity);
         }
-        else
+        else if (rb.velocity.magnitude > 0 && PredictPos.Count > 0)
         {
+            PredictPos.RemoveRange(0, 1);
+            PredictPos.Add(LastPredictionPos(rb.velocity));
+        }
+        else{
             PredictPos.Clear();
         }
     }
@@ -54,26 +59,22 @@ public class BallMovement : MonoBehaviour
         rb.velocity = Vector2.zero;
     }
 
-    List<Vector3> GenPredictionPos(Vector3 position, Vector3 velocity)
+    List<Vector3> GenPredictionPos(Vector3 Velocity)
     {
         List<Vector3> calculatedPos = new List<Vector3>();
 
-        Vector3 curPos = transform.position;
-        Vector3 curVelocity = velocity;
-
+        Vector3 predictionPosition = transform.position;
+        Vector3 predictionVelocity = Velocity;
 
         float deltaTime = Time.deltaTime;
 
         for (int i = 1; i <= PredictFrameCount; i++)
         {
-            Vector3 predictionVelocity = curVelocity * i * (1 - (rb.drag * deltaTime));
-            Vector3 predictionPosition = curPos + (i * deltaTime * predictionVelocity);
+            predictionVelocity *= 1 - (0.4f * deltaTime);
 
-            if (i % 5 == 0)
-            {
+            predictionPosition += predictionVelocity * deltaTime;
 
-            }
-
+            calculatedPos.Add(predictionPosition);
         }
 
         return calculatedPos;
@@ -90,8 +91,20 @@ public class BallMovement : MonoBehaviour
 
         predictionPosition = PredictPos[PredictPos.Count - 1] + predictionVelocity * deltaTime;
 
-        Instantiate(BallPrefab, predictionPosition, Quaternion.identity);
-
         return predictionPosition;
+    }
+
+    private void OnDrawGizmos()
+    {
+        // NullReferenceException: Object reference not set to an instance of an object
+        // BallMovement.OnDrawGizmos()(at Assets / Ball / Script / Ball / BallMovement.cs:99)
+        // UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean &)
+        if (Time.time > 0 && PredictPos.Count > 0)
+        {
+            for (int i = 1; i <= PredictFrameCount / 5; i++)
+            {
+                GizmosExtra.DrawWireDisk(PredictPos[i * 5 - 1], 0.5f, Color.green);
+            }
+        }
     }
 }

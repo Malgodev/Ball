@@ -11,7 +11,7 @@ public class GizmosExtra
         Color oldColor = Gizmos.color;
         Gizmos.color = color;
         Matrix4x4 oldMatrix = Gizmos.matrix;
-        Gizmos.matrix = Matrix4x4.TRS(position, Quaternion.identity, new Vector3(1, GIZMO_DISK_THICKNESS, 1));
+        Gizmos.matrix = Matrix4x4.TRS(position, Quaternion.identity, new Vector3(1, 1, GIZMO_DISK_THICKNESS));
         Gizmos.DrawWireSphere(Vector3.zero, radius);
         Gizmos.matrix = oldMatrix;
         Gizmos.color = oldColor;

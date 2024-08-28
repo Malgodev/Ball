@@ -62,8 +62,6 @@ public class FormationController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = new Color(1, 1, 1, 0.1f);
         GizmosExtra.DrawWireRectangle(formationPosition, formationScale.x, formationScale.y, Color.white);
-
     }
 }
