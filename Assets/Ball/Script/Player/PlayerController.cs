@@ -10,7 +10,8 @@ public class PlayerController : MonoBehaviour
     public Vector2 defaultOffset { get; private set; }
 
     // Movement
-    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float moveSpeed = 7f;
+    [SerializeField] private float moveSpeedScale = 10f;
 
     public Rigidbody2D rb { get; private set; }
 
@@ -42,39 +43,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
     }
 
-    public IEnumerator DribblingBall()
+    private void FixedUpdate()
     {
-        // TODO Change ball object logic, not stick to player -> ball will be kicked away and repeat
-
-        PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
-
-
-        while (playerHasBall && playerHasBall.Equals(this))
-        {
-            playerHasBall = GameController.Instance.PlayerHasBall;
-
-            Vector3 BallPos = transform.position;
-            BallPos += transform.right * 1f;
-            ball.transform.position = new Vector3(BallPos.x, BallPos.y, -1);
-            ball.GetComponent<BallMovement>().StopForce();
-
-            // Debug.Log((playerHasBall == null).ToString() + " " + playerHasBall.Equals(this));
-
-            yield return null;
-        }
-    }
-
-
-    public void ShotBall(GameObject ball)
-    {
-        // TODO Code to check how long the key has pressed -> convert to force
-
-        GameController.Instance.SetPlayerHasBall(null);
-
-        ball.GetComponent<BallMovement>().AddForce(500f, transform.right);
+        
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -85,10 +58,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    #region Initialization
     public void SetPosition(Vector2 targetPos)
     {
         transform.position = targetPos;
     }
+
+    public void SetRole(EPlayerRole role)
+    {
+        this.role = role;
+    }
+    #endregion
+
+    #region Movement controller
 
     /// <summary>
     /// Try to move player to that position, each time move by direction to that pos * move speed of player
@@ -121,8 +103,10 @@ public class PlayerController : MonoBehaviour
     {
         transform.rotation = GetRotationByDirection(movement);
 
-        rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+        // rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+        rb.AddForce(movement.normalized * moveSpeed * Time.fixedDeltaTime);
     }
+
 
     public Quaternion GetRotationByDirection(Vector2 direction)
     {
@@ -139,8 +123,51 @@ public class PlayerController : MonoBehaviour
             return this.transform.rotation;
         }
     }
-    public void SetRole(EPlayerRole role)
+
+    private void SpeedControl()
     {
-        this.role = role;
+
+    }
+
+    #endregion
+
+    #region Ball controller
+
+    public IEnumerator DribblingBall()
+    {
+        // TODO Change ball object logic, not stick to player -> ball will be kicked away and repeat
+
+        PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
+
+
+        while (playerHasBall && playerHasBall.Equals(this))
+        {
+            playerHasBall = GameController.Instance.PlayerHasBall;
+
+            Vector3 BallPos = transform.position;
+            BallPos += transform.right * 1f;
+            ball.transform.position = new Vector3(BallPos.x, BallPos.y, -1);
+            ball.GetComponent<BallMovement>().StopForce();
+
+            // Debug.Log((playerHasBall == null).ToString() + " " + playerHasBall.Equals(this));
+
+            yield return null;
+        }
+    }
+
+    public void ShotBall(GameObject ball)
+    {
+        // TODO Code to check how long the key has pressed -> convert to force
+
+        GameController.Instance.SetPlayerHasBall(null);
+
+        ball.GetComponent<BallMovement>().AddForce(500f, transform.right);
+    }
+    #endregion
+
+
+    private void OnDrawGizmos()
+    {
+        GizmosExtra.DrawString(rb.velocity.ToString(), transform.position, Color.white, Color.black);
     }
 }
