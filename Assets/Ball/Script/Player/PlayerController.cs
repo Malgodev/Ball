@@ -10,8 +10,8 @@ public class PlayerController : MonoBehaviour
     public Vector2 defaultOffset { get; private set; }
 
     // Movement
-    [SerializeField] private float moveSpeed = 7f;
-    [SerializeField] private float moveSpeedScale = 10f;
+    [SerializeField] private float moveSpeed = 10f;
+    private static float moveSpeedScale = 250f;
 
     public Rigidbody2D rb { get; private set; }
 
@@ -43,6 +43,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        SpeedControl();
     }
 
     private void FixedUpdate()
@@ -77,6 +78,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void MoveToPosition(Vector2 targetPos)
     {
+        Debug.Log(Vector2.Distance(targetPos, (Vector2)transform.position));
+
         if (Vector2.Distance(targetPos, (Vector2) transform.position) < 0.1f)
         {
             return;
@@ -88,7 +91,7 @@ public class PlayerController : MonoBehaviour
 
         transform.rotation = GetRotationByDirection(direc);
 
-        rb.MovePosition(rb.position + direc * moveSpeed * Time.fixedDeltaTime);
+        rb.AddForce(direc * moveSpeed * moveSpeedScale * Time.fixedDeltaTime);
 
     }
 
@@ -96,7 +99,7 @@ public class PlayerController : MonoBehaviour
     {
         transform.rotation = GetRotationByDirection(direction);
 
-        rb.MovePosition(rb.position + direction * Mathf.Min(value, moveSpeed) * Time.fixedDeltaTime);
+        rb.AddForce(direction * Mathf.Min(value, moveSpeed) * moveSpeedScale * Time.fixedDeltaTime);
     }
 
     public void MoveByAxis(Vector2 movement)
@@ -104,7 +107,7 @@ public class PlayerController : MonoBehaviour
         transform.rotation = GetRotationByDirection(movement);
 
         // rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
-        rb.AddForce(movement.normalized * moveSpeed * Time.fixedDeltaTime);
+        rb.AddForce(movement.normalized * moveSpeed * moveSpeedScale * Time.fixedDeltaTime);
     }
 
 
@@ -126,7 +129,10 @@ public class PlayerController : MonoBehaviour
 
     private void SpeedControl()
     {
-
+        if (rb.velocity.magnitude > moveSpeed)
+        {
+            rb.velocity = rb.velocity.normalized * moveSpeed;
+        }
     }
 
     #endregion
@@ -165,9 +171,10 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-
     private void OnDrawGizmos()
     {
-        GizmosExtra.DrawString(rb.velocity.ToString(), transform.position, Color.white, Color.black);
+        float vel = rb.velocity.magnitude;
+        vel = Mathf.Floor(vel * 100) / 100;
+        GizmosExtra.DrawString(vel.ToString(), transform.position, Color.white, Color.black);
     }
 }
