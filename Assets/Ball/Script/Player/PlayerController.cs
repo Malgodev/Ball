@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        
+        TimeToReachBall();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -57,6 +57,24 @@ public class PlayerController : MonoBehaviour
         {
             GameController.Instance.SetPlayerHasBall(this);
         }
+    }
+
+    private float TimeToReachBall()
+    {
+        BallMovement ballMovement = GameController.Instance.ball.GetComponent<BallMovement>();
+
+        if (ballMovement.PredictPos.Count == 0)
+        {
+            return -1;  
+        }
+
+        /// TODO hard code 120
+        for (int i = 0; i <= 120; i++)
+        {
+            // rb.
+        }
+
+        return 0;
     }
 
     #region Initialization
@@ -71,6 +89,7 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
+    // Put this into other player script
     #region Movement controller
 
     /// <summary>
@@ -78,8 +97,6 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public void MoveToPosition(Vector2 targetPos)
     {
-        Debug.Log(Vector2.Distance(targetPos, (Vector2)transform.position));
-
         if (Vector2.Distance(targetPos, (Vector2) transform.position) < 0.1f)
         {
             return;

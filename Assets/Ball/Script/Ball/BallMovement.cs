@@ -17,7 +17,7 @@ public class BallMovement : MonoBehaviour
 
     public static string BallTag = "Ball";
 
-    private List<Vector3> PredictPos;
+    public List<Vector3> PredictPos { get; private set; }
     private Vector3 initTransform;
     private int PredictFrameCount = 120;
 
