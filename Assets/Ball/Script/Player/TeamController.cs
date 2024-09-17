@@ -45,6 +45,29 @@ public class TeamController : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        for (int i = 0; i < PlayerList.Count; i++)
+        {
+            PlayerController playerController = PlayerList[i].GetComponent<PlayerController>();
+
+            
+
+/*
+            if (playerController == ControlledPlayer)
+            {
+                continue;
+            }
+
+            if (playerController.role == EPlayerRole.Goalkeeper)
+            {
+                continue;
+            }
+
+            playerController.MoveToPosition(formationController.GetWorldPositionByOffset(playerController.defaultOffset));*/
+        }
+    }
+
     private void ShotBall()
     {
         // wtf is this code?

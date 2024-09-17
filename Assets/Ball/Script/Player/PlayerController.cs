@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    // Player need time to reach maximum speed
+    // and also need time to slower down
 
     public EPlayerRole role { get; private set; }
 
@@ -48,7 +50,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        TimeToReachBall();
+        // TimeToReachBall();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -68,13 +70,24 @@ public class PlayerController : MonoBehaviour
             return -1;  
         }
 
-        /// TODO hard code 120
-        for (int i = 0; i <= 120; i++)
+        float radius = 0;
+        float frame = 0;
+        
+        // TODO hard code 12
+        // Possible solution: using deltatime to check if 2sec has pass
+        for (int i = 1; i <= 120; i++)
         {
-            // rb.
+            // function to calculate moveable position in next frame
+            radius += moveSpeed * Time.fixedDeltaTime;
+            frame = i;
+
+            if (Vector3.Distance(this.transform.position, ballMovement.PredictPos[i - 1]) < radius)
+            {
+                return frame;
+            }
         }
 
-        return 0;
+        return frame;
     }
 
     #region Initialization
@@ -190,8 +203,12 @@ public class PlayerController : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        string str = "";
+        // Player velocity
         float vel = rb.velocity.magnitude;
-        vel = Mathf.Floor(vel * 100) / 100;
-        GizmosExtra.DrawString(vel.ToString(), transform.position, Color.white, Color.black);
+        str += (Mathf.Floor(vel * 100) / 100).ToString() + " ";
+        str += TimeToReachBall() != -1 ? TimeToReachBall() : "";
+
+        GizmosExtra.DrawString(str, transform.position, Color.white, Color.black);
     }
 }
