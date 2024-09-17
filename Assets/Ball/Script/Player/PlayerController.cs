@@ -19,9 +19,13 @@ public class PlayerController : MonoBehaviour
 
     private GameObject ball;
 
+    public float timeToReachBall { get; private set; } = -1f;
+
     UserInput userInput;
 
     public IEnumerator dribblingBall { get; private set; }
+
+    public Color textColor = Color.white;
 
     private void Awake()
     {
@@ -61,7 +65,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private float TimeToReachBall()
+    private float GetTimeToReachBall()
     {
         BallMovement ballMovement = GameController.Instance.ball.GetComponent<BallMovement>();
 
@@ -83,6 +87,7 @@ public class PlayerController : MonoBehaviour
 
             if (Vector3.Distance(this.transform.position, ballMovement.PredictPos[i - 1]) < radius)
             {
+                timeToReachBall = frame;
                 return frame;
             }
         }
@@ -207,8 +212,8 @@ public class PlayerController : MonoBehaviour
         // Player velocity
         float vel = rb.velocity.magnitude;
         str += (Mathf.Floor(vel * 100) / 100).ToString() + " ";
-        str += TimeToReachBall() != -1 ? TimeToReachBall() : "";
+        str += GetTimeToReachBall() != -1 ? GetTimeToReachBall() : "";
 
-        GizmosExtra.DrawString(str, transform.position, Color.white, Color.black);
+        GizmosExtra.DrawString(str, transform.position, textColor, Color.black);
     }
 }

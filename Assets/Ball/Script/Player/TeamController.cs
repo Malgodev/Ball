@@ -13,7 +13,8 @@ public class TeamController : MonoBehaviour
     List<GameObject> PlayerList;
 
     public PlayerController ControlledPlayer { get; private set; }
-
+    public PlayerController closestPlayerToBall { get; private set; }
+    [field: SerializeField] public bool isControlledPlayer { get; private set; }
     private UserInput userInput;
 
     private void Awake()
@@ -50,29 +51,49 @@ public class TeamController : MonoBehaviour
         for (int i = 0; i < PlayerList.Count; i++)
         {
             PlayerController playerController = PlayerList[i].GetComponent<PlayerController>();
-
             
-
-/*
-            if (playerController == ControlledPlayer)
+            if (playerController == CompareclosestPlayerToBall(closestPlayerToBall, playerController))
             {
-                continue;
+#if UNITY_EDITOR
+                playerController.textColor = Color.green;
+                if (closestPlayerToBall != null)
+                {
+                    closestPlayerToBall.textColor = Color.white;
+                }
+#endif
+                closestPlayerToBall = playerController;
             }
 
-            if (playerController.role == EPlayerRole.Goalkeeper)
+/*            if (closestPlayerToBall.timeToReachBall == -1 ||
+                closestPlayerToBall.timeToReachBall > playerController.timeToReachBall)
             {
-                continue;
-            }
-
-            playerController.MoveToPosition(formationController.GetWorldPositionByOffset(playerController.defaultOffset));*/
+#if UNITY_EDITOR
+                closestPlayerToBall.textColor = Color.white;
+                playerController.textColor = Color.green;
+#endif
+                closestPlayerToBall = playerController;
+            }*/
         }
     }
 
-    private void ShotBall()
+    private PlayerController CompareclosestPlayerToBall(PlayerController currentPlayer, PlayerController targetPlayer)
     {
-        // wtf is this code?
-        // Shoud I covert this to singletone
-        GameController.Instance.PlayerHasBall.ShotBall(ball);
+        if (currentPlayer == null)
+        {
+           return targetPlayer;
+        }
+
+        if (currentPlayer.timeToReachBall == -1)
+        {
+            return targetPlayer;
+        }
+
+        if (currentPlayer.timeToReachBall > targetPlayer.timeToReachBall)
+        {
+            return targetPlayer;
+        }
+
+        return currentPlayer;
     }
 
     public void SetPlayerIsControlled(PlayerController player)
@@ -99,6 +120,9 @@ public class TeamController : MonoBehaviour
             playerController.SetPosition(newPos);
         }
 
-        SetPlayerIsControlled(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
+        if (isControlledPlayer)
+        {
+            SetPlayerIsControlled(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
+        }
     }
 }
