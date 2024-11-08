@@ -66,6 +66,7 @@ public class GeneratePlayer : MonoBehaviour
         int delta = 0;
         EPlayerRole previosRole = EPlayerRole.Goalkeeper;
 
+
         foreach (EPlayerRole role in playerRole)
         {
             if (previosRole != role)
@@ -81,7 +82,7 @@ public class GeneratePlayer : MonoBehaviour
             switch (role)
             {
                 // TODO Change hard code
-                // TO DO: Set the player position more dynamic
+                // Set the player position more dynamic
                 // E.g: Defender will strict together more than midfielder
                 case EPlayerRole.Goalkeeper:
                     playerList.Add(CreatePlayer(role, new Vector2(0, 0), 1, 0));

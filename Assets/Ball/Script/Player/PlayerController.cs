@@ -1,12 +1,26 @@
+using Mono.Cecil.Cil;
 using System.Collections;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.ShaderData;
+
+public enum EPlayerState
+{
+    Run,
+    Challenge,
+    Shot,
+    Pass,
+    RunToBall,
+}
 
 public class PlayerController : MonoBehaviour
 {
     // Player need time to reach maximum speed
     // and also need time to slower down
 
-    public EPlayerRole role { get; private set; }
+    public EPlayerRole Role { get; private set; }
+    public EPlayerState PlayerState { get; private set; }
 
     // The position of player in formation rectangle
     public Vector2 defaultOffset { get; private set; }
@@ -14,26 +28,51 @@ public class PlayerController : MonoBehaviour
     // Movement
     [SerializeField] private float moveSpeed = 10f;
     private static float moveSpeedScale = 250f;
+    public float MoveableRadius;
 
     public Rigidbody2D rb { get; private set; }
 
     private GameObject ball;
 
-    public float timeToReachBall { get; private set; } = -1f;
+    public float TimeToReachBall { get; private set; } = -1f;
 
     UserInput userInput;
 
-    public IEnumerator dribblingBall { get; private set; }
-
     public Color textColor = Color.white;
+
+    public bool IsTeamOne { get; private set; } = false;
+
+    private bool isClosestToBall = false;
+
+    public float DangerRate { get; private set; } = 0;
+    public float DangerRadius = 10f;
+    public const float DANGER_RATE_SPEED = 3f;
+
+    const int UPDATED_FRAME_INTERVAL = 500;
+    int frameCounter = 0;
+
+    public Vector2 DeltaPosition;
+
+    private Vector2 targetPosition;
 
     private void Awake()
     {
+        // IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
+
         rb = GetComponent<Rigidbody2D>();
+
+        moveSpeed += UnityEngine.Random.Range(-.5f, .5f);
+
+        // formationRectangle = GameSingleton.Instance.teamController.formationRectangle;
+    }
+
+    private void Start()
+    {
+        IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
 
         ball = GameController.Instance.ball;
 
-        // formationRectangle = GameSingleton.Instance.teamController.formationRectangle;
+        DeltaPosition = new Vector2(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5));
     }
 
     public void SetDefaultOffset(Vector2 DefaultOffset)
@@ -41,20 +80,102 @@ public class PlayerController : MonoBehaviour
         this.defaultOffset = DefaultOffset;
     }
 
-    void Start()
-    {
-        dribblingBall = DribblingBall();
-    }
-
     // Update is called once per frame
     void Update()
     {
         SpeedControl();
+        
+        UpdateDangerRate();
+
+        if (frameCounter++ >= UPDATED_FRAME_INTERVAL)
+        {
+            DeltaPosition = new Vector2(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5));
+            frameCounter = 0;
+        }
+    }
+
+    private void UpdateDangerRate()
+    {
+        // List<GameObject> enemyPlayers = GameController.Instance.GetEnemyPlayer(IsTeamOne);
+
+        Collider2D[] colliderNear = Physics2D.OverlapCircleAll(transform.position, DangerRadius);
+
+        int playerInFront = 0;
+        bool isGetChallenge = false;
+
+        foreach (Collider2D collider in colliderNear)
+        {
+            PlayerController playerController = collider.GetComponent<PlayerController>();
+
+
+            if (collider.tag == "Player" && IsEnemyInFront(playerController))
+            {
+                if (playerController.PlayerState == EPlayerState.Challenge)
+                {
+                    isGetChallenge = true;
+                }
+
+                playerInFront++;
+            }
+        }
+
+        if (isGetChallenge)
+        {
+            DangerRate = Mathf.Lerp(DangerRate, 1, Time.deltaTime * DANGER_RATE_SPEED);
+        }
+        else if (!isGetChallenge && playerInFront > 0)
+        {
+            float targetDangerRate = Mathf.Clamp(playerInFront / 3f, 0.3f, 1f);
+            DangerRate = Mathf.Lerp(DangerRate, targetDangerRate, Time.deltaTime * DANGER_RATE_SPEED * playerInFront);
+        }
+        else
+        {
+            DangerRate = Mathf.Lerp(DangerRate, -1, Time.deltaTime * DANGER_RATE_SPEED);
+        }
+    }
+
+    private bool IsEnemyInFront(PlayerController targetPlayer)
+    {
+        if (this.IsTeamOne == targetPlayer.IsTeamOne)
+        {
+            return false;
+        }
+
+        if (this.gameObject == targetPlayer)
+        {
+            return false;
+        }
+
+        Vector2 direction = targetPlayer.transform.position - transform.position;
+        float angle = Vector2.Angle(transform.right, direction);
+
+        return angle <= 90f;
     }
 
     private void FixedUpdate()
     {
-        // TimeToReachBall();
+        switch (PlayerState)
+        {
+            case EPlayerState.Run:
+                if (Role != EPlayerRole.Goalkeeper)
+                {
+                    MoveToPosition(targetPosition);
+                }
+
+                break;
+            case EPlayerState.Challenge:
+                ChallengeBall();
+                break;
+            case EPlayerState.Shot:
+                ShotBall(GameController.Instance.ball);
+                break;
+            case EPlayerState.Pass:
+                PassBall(GameController.Instance.ball);
+                break;
+            case EPlayerState.RunToBall:
+                RunToBall();
+                break;
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -71,7 +192,9 @@ public class PlayerController : MonoBehaviour
 
         if (ballMovement.PredictPos.Count == 0)
         {
-            return -1;  
+            float distanceToBall = Vector3.Distance(this.transform.position, ballMovement.transform.position);
+            TimeToReachBall = distanceToBall / moveSpeed;
+            return TimeToReachBall;
         }
 
         float radius = 0;
@@ -87,7 +210,7 @@ public class PlayerController : MonoBehaviour
 
             if (Vector3.Distance(this.transform.position, ballMovement.PredictPos[i - 1]) < radius)
             {
-                timeToReachBall = frame;
+                TimeToReachBall = frame;
                 return frame;
             }
         }
@@ -103,7 +226,7 @@ public class PlayerController : MonoBehaviour
 
     public void SetRole(EPlayerRole role)
     {
-        this.role = role;
+        this.Role = role;
     }
     #endregion
 
@@ -113,38 +236,47 @@ public class PlayerController : MonoBehaviour
     /// <summary>
     /// Try to move player to that position, each time move by direction to that pos * move speed of player
     /// </summary>
-    public void MoveToPosition(Vector2 targetPos)
+    public void MoveToPosition(Vector2 targetPos, bool isDelta = true)
     {
-        if (Vector2.Distance(targetPos, (Vector2) transform.position) < 0.1f)
+        if (isDelta)
+        {
+            targetPos += DeltaPosition;
+        }
+
+        Vector2 currentPosition = transform.position;
+        Vector2 direc = targetPos - currentPosition;
+
+        direc = direc.normalized;
+
+        if (Vector2.Distance(currentPosition, targetPos) > MoveableRadius)
+        {
+            targetPos = currentPosition + direc * MoveableRadius;
+        }
+
+        if (Vector2.Distance(targetPos, currentPosition) < 0.5f)
         {
             return;
         }
 
-        Vector2 direc = targetPos -  (Vector2) transform.position;
-
-        direc = direc.normalized;
 
         transform.rotation = GetRotationByDirection(direc);
 
         rb.AddForce(direc * moveSpeed * moveSpeedScale * Time.fixedDeltaTime);
-
-    }
-
-    public void MoveByForce(Vector2 direction, float value)
-    {
-        transform.rotation = GetRotationByDirection(direction);
-
-        rb.AddForce(direction * Mathf.Min(value, moveSpeed) * moveSpeedScale * Time.fixedDeltaTime);
     }
 
     public void MoveByAxis(Vector2 movement)
     {
+
         transform.rotation = GetRotationByDirection(movement);
 
         // rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
         rb.AddForce(movement.normalized * moveSpeed * moveSpeedScale * Time.fixedDeltaTime);
-    }
 
+        // move player to position, should change it to better movement.
+        // attack fb, chuyen len phia tren striker
+        // def fb, chan bong cua thang striker
+
+    }
 
     public Quaternion GetRotationByDirection(Vector2 direction)
     {
@@ -169,11 +301,9 @@ public class PlayerController : MonoBehaviour
             rb.velocity = rb.velocity.normalized * moveSpeed;
         }
     }
-
     #endregion
 
     #region Ball controller
-
     public IEnumerator DribblingBall()
     {
         // TODO Change ball object logic, not stick to player -> ball will be kicked away and repeat
@@ -196,6 +326,19 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void ChallengeBall()
+    {
+        PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
+        Vector2 targetPos = playerHasBall.transform.position + playerHasBall.transform.right;
+
+        MoveToPosition(targetPos, false);
+    }
+
+    public void RunToBall()
+    {
+        MoveToPosition(ball.transform.position, false);
+    }
+
     public void ShotBall(GameObject ball)
     {
         // TODO Code to check how long the key has pressed -> convert to force
@@ -204,16 +347,72 @@ public class PlayerController : MonoBehaviour
 
         ball.GetComponent<BallMovement>().AddForce(500f, transform.right);
     }
+
+    public void PassBall(GameObject ball, GameObject targetPass = null)
+    {
+        if (targetPass == null)
+        {
+            targetPass = GetBestPlayerToPass();
+        }
+    }
+
+    private GameObject GetBestPlayerToPass()
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 30f);
+
+        List<GameObject> possiblePlayer = new List<GameObject>();
+
+        GameObject bestPlayer = null;
+        float minDangerRate = 1f;
+
+        foreach (Collider2D collider in colliders)
+        {
+            if (collider.tag != "Player")
+            {
+                continue;
+            }
+
+            PlayerController playerController = collider.GetComponent<PlayerController>();
+
+            if (IsTeamOne != playerController.IsTeamOne)
+            {
+                continue;
+            }
+
+            if (playerController.DangerRate <= minDangerRate) 
+            {
+                bestPlayer = playerController.gameObject;
+            }
+        }
+
+
+        return bestPlayer;
+    }
+
     #endregion
 
+    public void SetPlayerTargetPosition(Vector2 target)
+    {
+        targetPosition = target;
+    }
+
+
+    public void SetPlayerState(EPlayerState playerState)
+    {
+        PlayerState = playerState;
+    }
     private void OnDrawGizmos()
     {
         string str = "";
         // Player velocity
         float vel = rb.velocity.magnitude;
+        str += PlayerState + " ";
         str += (Mathf.Floor(vel * 100) / 100).ToString() + " ";
-        str += GetTimeToReachBall() != -1 ? GetTimeToReachBall() : "";
+        str += (Mathf.Floor(DangerRate * 100) / 100).ToString() + " ";
+        str += GetTimeToReachBall() != -1 ? Mathf.Round(GetTimeToReachBall() * 100) / 100 : " ?";
 
         GizmosExtra.DrawString(str, transform.position, textColor, Color.black);
+
+        // GizmosExtra.DrawWireDisk(transform.position, DangerRadius, Color.red);
     }
 }
