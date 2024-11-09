@@ -124,4 +124,9 @@ public class GameController : MonoBehaviour
 
         return Vector2.Distance(goalPos, playerController.transform.position);
     }
+
+    public Transform GetGoal(bool isTeamOne)
+    {
+        return !isTeamOne ? teamOneGoal.transform : teamTwoGoal.transform;
+    }
 }

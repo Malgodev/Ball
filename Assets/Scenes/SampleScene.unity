@@ -546,7 +546,7 @@ MonoBehaviour:
   <formation>k__BackingField: 0
   <formationController>k__BackingField: {fileID: 967645098}
   <formationAI>k__BackingField: {fileID: 967645099}
-  <IsControlledPlayer>k__BackingField: 1
+  <IsControlledPlayer>k__BackingField: 0
   IsTeamOne: 0
 --- !u!4 &802361750
 Transform:
@@ -1505,7 +1505,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8795650602875553323, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.36
+      value: 15.13
       objectReference: {fileID: 0}
     - target: {fileID: 8795650602875553323, guid: af3005a6ac96780499ae8c1fe87f2e2f, type: 3}
       propertyPath: m_LocalPosition.z

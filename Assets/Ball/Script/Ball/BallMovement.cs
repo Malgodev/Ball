@@ -21,6 +21,7 @@ public class BallMovement : MonoBehaviour
     private Vector3 initTransform;
     private int PredictFrameCount = 120;
 
+    private int VELOCITY_SCALE = 20;
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -51,7 +52,14 @@ public class BallMovement : MonoBehaviour
 
     public void AddForce(float Force, Vector3 Direction)
     {
-        rb.AddForce(Direction * Force);
+        // this.transform.position += transform.right * 3f;
+
+        rb.AddForce(Direction * Force * VELOCITY_SCALE);
+    }
+
+    public void AddForce(Vector2 Force)
+    {
+        rb.AddForce(Force);
     }
 
     public void StopForce()
@@ -70,7 +78,7 @@ public class BallMovement : MonoBehaviour
 
         for (int i = 1; i <= PredictFrameCount; i++)
         {
-            predictionVelocity *= 1 - (0.4f * deltaTime);
+            predictionVelocity *= 1 - (rb.drag * deltaTime);
 
             predictionPosition += predictionVelocity * deltaTime;
 

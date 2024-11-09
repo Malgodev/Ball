@@ -1,8 +1,11 @@
 using Mono.Cecil.Cil;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Timeline;
 using UnityEngine;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 using static UnityEditor.ShaderData;
 
 public enum EPlayerState
@@ -12,6 +15,7 @@ public enum EPlayerState
     Shot,
     Pass,
     RunToBall,
+    ReceiveBall,
 }
 
 public class PlayerController : MonoBehaviour
@@ -54,6 +58,8 @@ public class PlayerController : MonoBehaviour
     public Vector2 DeltaPosition;
 
     private Vector2 targetPosition;
+
+    private int timeToPass = 60;
 
     private void Awake()
     {
@@ -154,6 +160,11 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (this == GameController.Instance.teamOneController.ControlledPlayer)
+        {
+            return;
+        }
+
         switch (PlayerState)
         {
             case EPlayerState.Run:
@@ -329,6 +340,13 @@ public class PlayerController : MonoBehaviour
     public void ChallengeBall()
     {
         PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
+
+        if (!playerHasBall)
+        {
+            MoveToPosition(targetPosition);
+            return;
+        }
+
         Vector2 targetPos = playerHasBall.transform.position + playerHasBall.transform.right;
 
         MoveToPosition(targetPos, false);
@@ -345,8 +363,22 @@ public class PlayerController : MonoBehaviour
 
         GameController.Instance.SetPlayerHasBall(null);
 
-        ball.GetComponent<BallMovement>().AddForce(500f, transform.right);
+        Transform goal = GameController.Instance.GetGoal(IsTeamOne);
+
+
+        Vector2 shootingDirection = goal.position - transform.position;
+        shootingDirection.Normalize();
+
+        transform.rotation = GetRotationByDirection(shootingDirection);
+
+        rb.velocity = Vector2.zero;
+
+        StopAllCoroutines();
+
+        ball.GetComponent<BallMovement>().AddForce(50f, shootingDirection);
+        GameController.Instance.SetPlayerHasBall(null);
     }
+
 
     public void PassBall(GameObject ball, GameObject targetPass = null)
     {
@@ -354,6 +386,19 @@ public class PlayerController : MonoBehaviour
         {
             targetPass = GetBestPlayerToPass();
         }
+
+        Vector2 passingDirection = (targetPass.transform.position - transform.position);
+        passingDirection.Normalize();
+
+        // TODO Code to check how long the key has pressed -> convert to force
+
+        transform.rotation = GetRotationByDirection(passingDirection);
+
+        rb.velocity = Vector2.zero;
+
+        StopAllCoroutines();
+        GameController.Instance.SetPlayerHasBall(null);
+        ball.GetComponent<BallMovement>().AddForce(50f, passingDirection);
     }
 
     private GameObject GetBestPlayerToPass()
@@ -379,7 +424,7 @@ public class PlayerController : MonoBehaviour
                 continue;
             }
 
-            if (playerController.DangerRate <= minDangerRate) 
+            if (playerController.Role != EPlayerRole.Goalkeeper && playerController.DangerRate <= minDangerRate) 
             {
                 bestPlayer = playerController.gameObject;
             }

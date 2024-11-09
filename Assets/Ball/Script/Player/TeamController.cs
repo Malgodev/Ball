@@ -21,6 +21,8 @@ public class TeamController : MonoBehaviour
 
     public bool IsTeamOne = false;
 
+    private int updateCounter = 0;
+
     private void Awake()
     {
         PlayerList = new List<GameObject>();
@@ -37,6 +39,13 @@ public class TeamController : MonoBehaviour
 
     private void Update()
     {
+        updateCounter++;
+        if (updateCounter >= 5)
+        {
+            updateCounter = 0;
+            return;
+        }
+
         foreach (GameObject player in PlayerList)
         {
             PlayerController playerController = player.GetComponent<PlayerController>();
