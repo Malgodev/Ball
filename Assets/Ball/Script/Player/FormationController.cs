@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class FormationController : MonoBehaviour
+public class FormationController : NetworkBehaviour
 {
     public bool IsTeamOne = false;
 
@@ -10,29 +11,26 @@ public class FormationController : MonoBehaviour
 
     public ETeamState curState { get; private set; }
 
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
-        //#if UNITY_EDITOR
-        //        this.GetComponent<SpriteRenderer>().enabled = true;
-        //#endif
+        base.OnNetworkSpawn();
+
+        IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
+
+        if (IsTeamOne)
+        {
+            formationPosition = new Vector2(formationPosition.x + 10f, formationPosition.y);
+        }
 
         formationRectangle = GetComponent<Transform>();
-
 
         formationPosition = transform.position;
         formationScale = transform.localScale;
     }
 
-    private void Start()
-    {
-        if (IsTeamOne)
-        {
-            formationPosition = new Vector2(formationPosition.x + 10f, formationPosition.y);
-        }
-    }
-
     private void Update()
     {
+        Debug.Log("Updating " + formationPosition + " " + formationScale);
         formationRectangle.position = formationPosition;
         formationRectangle.localScale = formationScale;
     }
@@ -93,6 +91,18 @@ public class FormationController : MonoBehaviour
         result.y = formationPosition.y + (offset.y / 100 * formationScale.y - formationScale.y / 2);
 
         return result;
+    }
+
+    public Vector2 GetOffsetByWorldPosition(Vector2 worldPosition)
+    {
+        Vector2 offset = Vector2.zero;
+
+        int delta = IsTeamOne ? 1 : -1;
+
+        offset.x = ((worldPosition.x - formationPosition.x) / delta + formationScale.x / 2) * 100 / formationScale.x;
+        offset.y = ((worldPosition.y - formationPosition.y) + formationScale.y / 2) * 100 / formationScale.y;
+
+        return offset;
     }
 
 #if UNITY_EDITOR

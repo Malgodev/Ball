@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.LowLevel;
 
 [Serializable]
 public class TeamController : NetworkBehaviour
@@ -27,7 +28,7 @@ public class TeamController : NetworkBehaviour
 
     private int updateCounter = 0;
 
-    private const string PLAYER_TAG = "Player";
+    public const string PLAYER_TAG = "Player";
 
     private void Awake()
     {
@@ -50,6 +51,7 @@ public class TeamController : NetworkBehaviour
         base.OnNetworkSpawn();
 
         // GameController.Singleton.SpawnPlayer(this);
+        ball = GameController.Singleton.Ball;
 
         this.gameObject.name = "Team" + (IsTeamOne ? "One" : "Two");
 
@@ -57,7 +59,7 @@ public class TeamController : NetworkBehaviour
 
         if (IsControlledPlayer)
         {
-            SetPlayerIsControlled(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
+            SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
         }
     }
 
@@ -73,6 +75,7 @@ public class TeamController : NetworkBehaviour
         }
 
         PlayerController playerHasBall = GameController.Singleton.PlayerHasBall;
+
         foreach (GameObject player in PlayerList)
         {
             PlayerController playerController = player.GetComponent<PlayerController>();
@@ -84,11 +87,8 @@ public class TeamController : NetworkBehaviour
                 continue;
             }
 
-            Vector2 defaultTargetPos = formationController.GetWorldPositionByOffset(playerController.defaultOffset);
-
+            Vector2 defaultTargetPos = formationController.GetWorldPositionByOffset(playerController.DefaultOffset);
             GetTargetState(playerController, defaultTargetPos, playerHasBall);
-
-            // playerController.MoveToPosition(defaultTargetPos);
         }
     }
 
@@ -183,11 +183,17 @@ public class TeamController : NetworkBehaviour
         return false;
     }
 
-    public void SetPlayerIsControlled(PlayerController player)
+    public void SetControlledPlayer(PlayerController player)
     {
+        if (ControlledPlayer != null)
+        {
+            ControlledPlayer.SetPlayerState(EPlayerState.Run);
+        }
+
         ControlledPlayer = player;
 
         userInput.SetControlledPlayer(player);
+        ControlledPlayer.SetPlayerState(EPlayerState.Controlled);
     }
 
     public void SetAllTeamPlayer()
@@ -207,6 +213,7 @@ public class TeamController : NetworkBehaviour
         }
     }
 
+    // Outdated
     public void SetPlayerList(List<GameObject> targetPlayerList)
     {
         PlayerList = targetPlayerList;
@@ -229,13 +236,13 @@ public class TeamController : NetworkBehaviour
 
             player.name = playerController.Role.ToString() + " " + PlayerList.IndexOf(player);
 
-            Vector2 newPos = formationController.GetWorldPositionByOffset(playerController.defaultOffset);
+            Vector2 newPos = formationController.GetWorldPositionByOffset(playerController.DefaultOffset);
             playerController.SetPosition(newPos);
         }
 
         if (IsControlledPlayer)
         {
-            SetPlayerIsControlled(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
+            SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
         }
     }
 }

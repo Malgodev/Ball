@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
 public enum ETeamHasBall
@@ -17,7 +18,7 @@ public enum ETeamState
     Neutral
 }
 
-public class FormationAI : MonoBehaviour
+public class FormationAI : NetworkBehaviour
 {
     bool isHasBall = false;
     public bool IsTeamOne = false;
@@ -58,9 +59,10 @@ public class FormationAI : MonoBehaviour
 
     float delta = 1f;
 
-
-    private void Start()
+    public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
         formationController = GetComponent<FormationController>();
         ball = GameController.Singleton.Ball.transform;
 

@@ -49,6 +49,11 @@ public class BallMovement : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        GenPredictionPos(rb.velocity);
+    }
+
     public void AddForce(float Force, Vector3 Direction)
     {
         // this.transform.position += transform.right * 3f;
