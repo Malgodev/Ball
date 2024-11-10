@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditorInternal.ReorderableList;
 
 [Serializable]
 public class TeamController : MonoBehaviour
@@ -143,7 +142,7 @@ public class TeamController : MonoBehaviour
                 newClosestToBall = playerController;
             }
         }
-#if UNITY_EDITOR
+/*#if UNITY_EDITOR
         if (newClosestToBall != ClosestPlayerToBall)
         {
             newClosestToBall.textColor = Color.green;
@@ -153,7 +152,7 @@ public class TeamController : MonoBehaviour
             }
             ClosestPlayerToBall = newClosestToBall;
         }
-#endif
+#endif*/
     }
 
     private bool CompareClosestPlayerToBall(PlayerController currentPlayer, PlayerController targetPlayer)

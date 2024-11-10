@@ -1,9 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEditor.SceneTemplate;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class FormationController : MonoBehaviour
 {
@@ -100,10 +95,12 @@ public class FormationController : MonoBehaviour
         return result;
     }
 
-    private void OnDrawGizmos()
-    {
-        Color color = IsTeamOne ? Color.blue : Color.red;
+//#if UNITY_EDITOR
+//    private void OnDrawGizmos()
+//    {
+//        Color color = IsTeamOne ? Color.blue : Color.red;
 
-        GizmosExtra.DrawWireRectangle(formationPosition, formationScale.x, formationScale.y, color);
-    }
+//        GizmosExtra.DrawWireRectangle(formationPosition, formationScale.x, formationScale.y, color);
+//    }
+//#endif
 }

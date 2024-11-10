@@ -1,12 +1,6 @@
-using Mono.Cecil.Cil;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Timeline;
 using UnityEngine;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
-using static UnityEditor.ShaderData;
 
 public enum EPlayerState
 {
@@ -446,6 +440,7 @@ public class PlayerController : MonoBehaviour
     {
         PlayerState = playerState;
     }
+/*#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         string str = "";
@@ -460,4 +455,5 @@ public class PlayerController : MonoBehaviour
 
         // GizmosExtra.DrawWireDisk(transform.position, DangerRadius, Color.red);
     }
+#endif*/
 }

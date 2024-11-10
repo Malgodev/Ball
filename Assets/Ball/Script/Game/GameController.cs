@@ -67,7 +67,7 @@ public class GameController : MonoBehaviour
     public void SetPlayerHasBall(PlayerController player)
     {
         PlayerHasBall = player;
-
+ 
         if (player != null)
         {
             StartCoroutine(player.DribblingBall());

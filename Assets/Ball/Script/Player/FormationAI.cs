@@ -1,10 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEditor.SceneTemplate;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public enum ETeamHasBall
 {
@@ -202,11 +197,13 @@ public class FormationAI : MonoBehaviour
         );
     }
 
-    private void OnDrawGizmos()
-    {
-        string str = smoothedPossessionBalance.ToString();
-        Vector2 location = new Vector2(55 * (IsTeamOne ? -1 : 1), 55);
+//#if UNITY_EDITOR
+//    private void OnDrawGizmos()
+//    {
+//        string str = smoothedPossessionBalance.ToString();
+//        Vector2 location = new Vector2(55 * (IsTeamOne ? -1 : 1), 55);
 
-        GizmosExtra.DrawString(str, location, Color.green, Color.black);
-    }
+//        GizmosExtra.DrawString(str, location, Color.green, Color.black);
+//    }
+//#endif
 }

@@ -102,17 +102,17 @@ public class BallMovement : MonoBehaviour
         return predictionPosition;
     }
 
-    private void OnDrawGizmos()
-    {
-        // NullReferenceException: Object reference not set to an instance of an object
-        // BallMovement.OnDrawGizmos()(at Assets / Ball / Script / Ball / BallMovement.cs:99)
-        // UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean &)
-        if (Application.isPlaying && Application.isEditor && PredictPos.Count > 0)
-        {
-            for (int i = 1; i <= PredictFrameCount / 5; i++)
-            {
-                GizmosExtra.DrawWireDisk(PredictPos[i * 5 - 1], 0.5f, Color.green);
-            }
-        }
-    }
+    //private void OnDrawGizmos()
+    //{
+    //    // NullReferenceException: Object reference not set to an instance of an object
+    //    // BallMovement.OnDrawGizmos()(at Assets / Ball / Script / Ball / BallMovement.cs:99)
+    //    // UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean &)
+    //    if (Application.isPlaying && Application.isEditor && PredictPos.Count > 0)
+    //    {
+    //        for (int i = 1; i <= PredictFrameCount / 5; i++)
+    //        {
+    //            GizmosExtra.DrawWireDisk(PredictPos[i * 5 - 1], 0.5f, Color.green);
+    //        }
+    //    }
+    //}
 }
