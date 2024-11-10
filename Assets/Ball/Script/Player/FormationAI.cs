@@ -62,7 +62,7 @@ public class FormationAI : MonoBehaviour
     private void Start()
     {
         formationController = GetComponent<FormationController>();
-        ball = GameController.Instance.ball.transform;
+        ball = GameController.Singleton.Ball.transform;
 
         if (!IsTeamOne)
         {
@@ -92,7 +92,7 @@ public class FormationAI : MonoBehaviour
     }
     private void UpdateCompressionBalance()
     {
-        ETeamHasBall teamHasBall = GameController.Instance.GetTeamHasBall();
+        ETeamHasBall teamHasBall = GameController.Singleton.GetTeamHasBall();
 
         bool havingBall = (teamHasBall == ETeamHasBall.TeamOne && IsTeamOne) || 
                 (teamHasBall == ETeamHasBall.TeamTwo && !IsTeamOne);
@@ -159,7 +159,7 @@ public class FormationAI : MonoBehaviour
             target.x = Mathf.Lerp(Middle, UpperLimit - deltaX, smoothedPossessionBalance);
         }
 
-        Transform ballTransform = GameController.Instance.ball.transform;
+        Transform ballTransform = GameController.Singleton.Ball.transform;
 
         target.y = ballTransform.position.y;
 
@@ -172,7 +172,7 @@ public class FormationAI : MonoBehaviour
     {
         // TODO Put this into switch case of ETeamState
 
-        ETeamHasBall teamHasBall = GameController.Instance.GetTeamHasBall();
+        ETeamHasBall teamHasBall = GameController.Singleton.GetTeamHasBall();
 
         if (teamHasBall == ETeamHasBall.None)
         {
@@ -197,13 +197,13 @@ public class FormationAI : MonoBehaviour
         );
     }
 
-//#if UNITY_EDITOR
-//    private void OnDrawGizmos()
-//    {
-//        string str = smoothedPossessionBalance.ToString();
-//        Vector2 location = new Vector2(55 * (IsTeamOne ? -1 : 1), 55);
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        string str = smoothedPossessionBalance.ToString();
+        Vector2 location = new Vector2(55 * (IsTeamOne ? -1 : 1), 55);
 
-//        GizmosExtra.DrawString(str, location, Color.green, Color.black);
-//    }
-//#endif
+        Miscellaneous.GizmosExtra.DrawString(str, location, Color.green, Color.black);
+    }
+#endif
 }

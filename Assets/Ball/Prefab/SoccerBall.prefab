@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8054418111356444948}
   - component: {fileID: 203059334338840667}
   - component: {fileID: 6114843155401119229}
+  - component: {fileID: -5798550069673177371}
   m_Layer: 0
   m_Name: SoccerBall
   m_TagString: Untagged
@@ -161,5 +162,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8aa3d0f9cbd2f954cadf0c896ed39f24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BallPrefab: {fileID: 6429508636979079821, guid: 2d695e1b496921b4ca99736d51089c41, type: 3}
   rb: {fileID: 0}
+--- !u!114 &-5798550069673177371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6898010065699366121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3868831710
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1

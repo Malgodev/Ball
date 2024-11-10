@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class GeneratePlayer : MonoBehaviour
@@ -112,12 +113,15 @@ public class GeneratePlayer : MonoBehaviour
 
     static GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
     {
-        GameObject newPlayer = Instantiate(GameController.Instance.playerPrefab);
+        GameObject newPlayer = Instantiate(GameController.Singleton.PlayerPrefab);
         PlayerController playerController = newPlayer.GetComponent<PlayerController>();
         playerController.SetRole(role);
 
         offset.y = (delta + 1) * (100 / (numberOfRolePlayer + 1));
         playerController.SetDefaultOffset(offset);
+
+        NetworkObject networkObject = newPlayer.GetComponent<NetworkObject>();
+        networkObject.Spawn();
 
         return newPlayer;
     }

@@ -14,7 +14,7 @@ public enum EPlayerState
 
 public class PlayerController : MonoBehaviour
 {
-    // Player need time to reach maximum speed
+    // TODO Player need time to reach maximum speed
     // and also need time to slower down
 
     public EPlayerRole Role { get; private set; }
@@ -55,6 +55,8 @@ public class PlayerController : MonoBehaviour
 
     private int timeToPass = 60;
 
+    public PlayerController ControlledPlayer { get; private set; }
+
     private void Awake()
     {
         // IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
@@ -70,7 +72,7 @@ public class PlayerController : MonoBehaviour
     {
         IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
 
-        ball = GameController.Instance.ball;
+        // ball = GameController.Singleton.Ball;
 
         DeltaPosition = new Vector2(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5));
     }
@@ -154,10 +156,12 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (this == GameController.Instance.teamOneController.ControlledPlayer)
+        if (this == ControlledPlayer)
         {
             return;
         }
+
+        return;
 
         switch (PlayerState)
         {
@@ -172,10 +176,10 @@ public class PlayerController : MonoBehaviour
                 ChallengeBall();
                 break;
             case EPlayerState.Shot:
-                ShotBall(GameController.Instance.ball);
+                ShotBall(GameController.Singleton.Ball);
                 break;
             case EPlayerState.Pass:
-                PassBall(GameController.Instance.ball);
+                PassBall(GameController.Singleton.Ball);
                 break;
             case EPlayerState.RunToBall:
                 RunToBall();
@@ -187,13 +191,13 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag(BallMovement.BallTag))
         {
-            GameController.Instance.SetPlayerHasBall(this);
+            GameController.Singleton.SetPlayerHasBall(this);
         }
     }
 
     private float GetTimeToReachBall()
     {
-        BallMovement ballMovement = GameController.Instance.ball.GetComponent<BallMovement>();
+        BallMovement ballMovement = GameController.Singleton.Ball.GetComponent<BallMovement>();
 
         if (ballMovement.PredictPos.Count == 0)
         {
@@ -237,7 +241,6 @@ public class PlayerController : MonoBehaviour
 
     // Put this into other player script
     #region Movement controller
-
     /// <summary>
     /// Try to move player to that position, each time move by direction to that pos * move speed of player
     /// </summary>
@@ -276,11 +279,6 @@ public class PlayerController : MonoBehaviour
 
         // rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
         rb.AddForce(movement.normalized * moveSpeed * moveSpeedScale * Time.fixedDeltaTime);
-
-        // move player to position, should change it to better movement.
-        // attack fb, chuyen len phia tren striker
-        // def fb, chan bong cua thang striker
-
     }
 
     public Quaternion GetRotationByDirection(Vector2 direction)
@@ -313,12 +311,12 @@ public class PlayerController : MonoBehaviour
     {
         // TODO Change ball object logic, not stick to player -> ball will be kicked away and repeat
 
-        PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
+        PlayerController playerHasBall = GameController.Singleton.PlayerHasBall;
 
 
         while (playerHasBall && playerHasBall.Equals(this))
         {
-            playerHasBall = GameController.Instance.PlayerHasBall;
+            playerHasBall = GameController.Singleton.PlayerHasBall;
 
             Vector3 BallPos = transform.position;
             BallPos += transform.right * 1f;
@@ -333,7 +331,7 @@ public class PlayerController : MonoBehaviour
 
     public void ChallengeBall()
     {
-        PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
+        PlayerController playerHasBall = GameController.Singleton.PlayerHasBall;
 
         if (!playerHasBall)
         {
@@ -355,13 +353,9 @@ public class PlayerController : MonoBehaviour
     {
         // TODO Code to check how long the key has pressed -> convert to force
 
-        GameController.Instance.SetPlayerHasBall(null);
+        GameController.Singleton.SetPlayerHasBall(null);
 
-        Transform goal = GameController.Instance.GetGoal(IsTeamOne);
-
-
-        Vector2 shootingDirection = goal.position - transform.position;
-        shootingDirection.Normalize();
+        Vector2 shootingDirection = GameController.Singleton.GetDirectionToGoal(IsTeamOne, this);
 
         transform.rotation = GetRotationByDirection(shootingDirection);
 
@@ -370,7 +364,7 @@ public class PlayerController : MonoBehaviour
         StopAllCoroutines();
 
         ball.GetComponent<BallMovement>().AddForce(50f, shootingDirection);
-        GameController.Instance.SetPlayerHasBall(null);
+        GameController.Singleton.SetPlayerHasBall(null);
     }
 
 
@@ -391,7 +385,7 @@ public class PlayerController : MonoBehaviour
         rb.velocity = Vector2.zero;
 
         StopAllCoroutines();
-        GameController.Instance.SetPlayerHasBall(null);
+        GameController.Singleton.SetPlayerHasBall(null);
         ball.GetComponent<BallMovement>().AddForce(50f, passingDirection);
     }
 
@@ -440,20 +434,25 @@ public class PlayerController : MonoBehaviour
     {
         PlayerState = playerState;
     }
-/*#if UNITY_EDITOR
-    private void OnDrawGizmos()
-    {
-        string str = "";
-        // Player velocity
-        float vel = rb.velocity.magnitude;
-        str += PlayerState + " ";
-        str += (Mathf.Floor(vel * 100) / 100).ToString() + " ";
-        str += (Mathf.Floor(DangerRate * 100) / 100).ToString() + " ";
-        str += GetTimeToReachBall() != -1 ? Mathf.Round(GetTimeToReachBall() * 100) / 100 : " ?";
+//#if UNITY_EDITOR
+//    private void OnDrawGizmos()
+//    {
+//        if (!Application.isPlaying)
+//        {
+//            return;
+//        }
 
-        GizmosExtra.DrawString(str, transform.position, textColor, Color.black);
+//        string str = "";
+//        // Player velocity
+//        float vel = rb.velocity.magnitude;
+//        str += PlayerState + " ";
+//        str += (Mathf.Floor(vel * 100) / 100).ToString() + " ";
+//        str += (Mathf.Floor(DangerRate * 100) / 100).ToString() + " ";
+//        str += GetTimeToReachBall() != -1 ? Mathf.Round(GetTimeToReachBall() * 100) / 100 : " ?";
 
-        // GizmosExtra.DrawWireDisk(transform.position, DangerRadius, Color.red);
-    }
-#endif*/
+//        Miscellaneous.GizmosExtra.DrawString(str, transform.position, textColor, Color.black);
+
+//        // GizmosExtra.DrawWireDisk(transform.position, DangerRadius, Color.red);
+//    }
+//#endif
 }

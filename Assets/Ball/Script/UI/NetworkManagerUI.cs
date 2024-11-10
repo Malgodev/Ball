@@ -6,31 +6,19 @@ using UnityEngine.UI;
 
 public class NetworkManagerUI : MonoBehaviour
 {
-    [SerializeField] private Button hostBtn;
-    [SerializeField] private Button clientBtn;
+    [SerializeField] private Button startHostBtn;
+    [SerializeField] private Button startClientBtn;
 
     private void Awake()
     {
-        hostBtn.onClick.AddListener(() =>
+        startHostBtn.onClick.AddListener(() =>
         {
             NetworkManager.Singleton.StartHost();
         });
 
-        clientBtn.onClick.AddListener(() =>
+        startClientBtn.onClick.AddListener(() =>
         {
             NetworkManager.Singleton.StartClient();
         });
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

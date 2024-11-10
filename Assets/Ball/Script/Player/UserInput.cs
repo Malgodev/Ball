@@ -1,7 +1,8 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
-public class UserInput : MonoBehaviour
+public class UserInput : NetworkBehaviour
 {
     private PlayerController controlledPlayer;
 
@@ -22,6 +23,11 @@ public class UserInput : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!IsOwner)
+        {
+            return;
+        }
+
         if (controlledPlayer == null)
         {
             return;
@@ -47,9 +53,9 @@ public class UserInput : MonoBehaviour
 
     public void ShotBall()
     {
-        if (controlledPlayer == GameController.Instance.PlayerHasBall)
+        if (controlledPlayer == GameController.Singleton.PlayerHasBall)
         {
-            controlledPlayer.ShotBall(GameController.Instance.ball);
+            controlledPlayer.ShotBall(GameController.Singleton.Ball);
         }
     }
 

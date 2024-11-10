@@ -95,12 +95,12 @@ public class FormationController : MonoBehaviour
         return result;
     }
 
-//#if UNITY_EDITOR
-//    private void OnDrawGizmos()
-//    {
-//        Color color = IsTeamOne ? Color.blue : Color.red;
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        Color color = IsTeamOne ? Color.blue : Color.red;
 
-//        GizmosExtra.DrawWireRectangle(formationPosition, formationScale.x, formationScale.y, color);
-//    }
-//#endif
+        Miscellaneous.GizmosExtra.DrawWireRectangle(formationPosition, formationScale.x, formationScale.y, color);
+    }
+#endif
 }

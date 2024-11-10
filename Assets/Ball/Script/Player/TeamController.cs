@@ -1,41 +1,68 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 [Serializable]
-public class TeamController : MonoBehaviour
+public class TeamController : NetworkBehaviour
 {
+    public bool IsTeamOne = false;
+    [field: Header("Enviroment")]
     private GameObject ball;
+    private GameObject targetGoal;
 
+    [field: Header("Formation")]
     [field: SerializeField] public EFormation formation { get; private set; }
     [field: SerializeField] public FormationController formationController { get; private set; }
     [field: SerializeField] public FormationAI formationAI { get; private set; }
 
-    public List<GameObject> PlayerList { get; private set; }
+    [field: Header("Player")]
+    [field: SerializeField] public List<GameObject> PlayerList { get; private set; }
+    [field: SerializeField] public PlayerController ControlledPlayer { get; private set; }
+    [field: SerializeField] public PlayerController ClosestPlayerToBall { get; private set; }
 
-    public PlayerController ControlledPlayer { get; private set; }
-    public PlayerController ClosestPlayerToBall { get; private set; }
+    [field: Header("User control")]
     [field: SerializeField] public bool IsControlledPlayer { get; private set; }
     private UserInput userInput;
 
-    public bool IsTeamOne = false;
-
     private int updateCounter = 0;
+
+    private const string PLAYER_TAG = "Player";
 
     private void Awake()
     {
         PlayerList = new List<GameObject>();
 
         userInput = GetComponent<UserInput>();
+
     }
 
     private void Start()
     {
-        ball = GameController.Instance.ball;
+        // ball = GameController.Singleton.Ball;
+        // goal == get target goal;
         formationController.IsTeamOne = IsTeamOne;
         formationAI.IsTeamOne = IsTeamOne;
     }
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        // GameController.Singleton.SpawnPlayer(this);
+
+        this.gameObject.name = "Team" + (IsTeamOne ? "One" : "Two");
+
+        SetAllTeamPlayer();
+
+        if (IsControlledPlayer)
+        {
+            SetPlayerIsControlled(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
+        }
+    }
+
+    // Mostly use for set player state
+    // From that, player will automaticly move by that state
     private void Update()
     {
         updateCounter++;
@@ -45,6 +72,7 @@ public class TeamController : MonoBehaviour
             return;
         }
 
+        PlayerController playerHasBall = GameController.Singleton.PlayerHasBall;
         foreach (GameObject player in PlayerList)
         {
             PlayerController playerController = player.GetComponent<PlayerController>();
@@ -55,35 +83,33 @@ public class TeamController : MonoBehaviour
             {
                 continue;
             }
+
             Vector2 defaultTargetPos = formationController.GetWorldPositionByOffset(playerController.defaultOffset);
-            GetTargetPositionByRole(player, defaultTargetPos);
+
+            GetTargetState(playerController, defaultTargetPos, playerHasBall);
 
             // playerController.MoveToPosition(defaultTargetPos);
         }
     }
 
-    private void GetTargetPositionByRole(GameObject player, Vector2 defaultPos)
+    private void GetTargetState(PlayerController playerController, Vector2 defaultPos, PlayerController playerHasBall)
     {
-        PlayerController playerController = player.GetComponent<PlayerController>();
-        EPlayerRole role = playerController.Role;
+        // TODO Make this code dynamic based on player role
         float PossessionRate = formationAI.PossessionBalance;
         float DangerRate = playerController.DangerRate;
-
-        PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
 
         playerController.SetPlayerTargetPosition(defaultPos);
 
         if (playerController == playerHasBall)
         {
-            if (PossessionRate >= 0.9f && GameController.Instance.GetDistanceToGoal(IsTeamOne, playerController) < 10f)
+            // Here to, change singleton to get distance from current goal
+            if (PossessionRate >= 0.9f && GameController.Singleton.GetDistanceToGoal(IsTeamOne, playerController) < 10f)
             {
                 playerController.SetPlayerState(EPlayerState.Shot);
-                // playerController.AutoPassBall(ball);
             }
             else if (DangerRate >= 0.5f)
             {
                 playerController.SetPlayerState(EPlayerState.Pass);
-                // playerController.AutoRun(ball);
             }
             else
             {
@@ -92,16 +118,11 @@ public class TeamController : MonoBehaviour
         }
         else if (playerController == ClosestPlayerToBall && playerHasBall && PossessionRate <= -0.5f)
         {
-            Vector2 targetPos = playerHasBall.transform.position + playerHasBall.transform.right;
-
-            // playerController.MoveToPosition(targetPos, false);
-
             playerController.SetPlayerState(EPlayerState.Challenge);
         }
         else if (playerController == ClosestPlayerToBall && !playerHasBall)
         {
             playerController.SetPlayerState(EPlayerState.RunToBall);
-            // playerController.MoveToPosition(ball.transform.position, false);
         }
         else
         {
@@ -109,26 +130,8 @@ public class TeamController : MonoBehaviour
         }
     }
 
-    private Vector2 GetFullbackPosition(GameObject player, float PossessionRate, float DangerRate)
-    {
-        Vector2 targetPos = new Vector2();
-        PlayerController playerController = player.GetComponent<PlayerController>();
-        GameObject ball = GameController.Instance.ball;
 
-        targetPos.y = ball.transform.position.y;    
-
-        if (PossessionRate <= 0f)
-        {
-            targetPos.x = (IsTeamOne ? -1f : 1f) * playerController.MoveableRadius;
-        }
-        else
-        {
-            targetPos.x = (IsTeamOne ? 1f : -1f) * playerController.MoveableRadius;
-        }
-
-        return targetPos;
-    }
-
+    // Set other player field
     private void FixedUpdate()
     {
         PlayerController newClosestToBall = ClosestPlayerToBall;
@@ -142,7 +145,13 @@ public class TeamController : MonoBehaviour
                 newClosestToBall = playerController;
             }
         }
-/*#if UNITY_EDITOR
+
+        if (newClosestToBall != ClosestPlayerToBall)
+        {
+            ClosestPlayerToBall = newClosestToBall;
+        }
+
+#if UNITY_EDITOR
         if (newClosestToBall != ClosestPlayerToBall)
         {
             newClosestToBall.textColor = Color.green;
@@ -150,9 +159,8 @@ public class TeamController : MonoBehaviour
             {
                 ClosestPlayerToBall.textColor = Color.white;
             }
-            ClosestPlayerToBall = newClosestToBall;
         }
-#endif*/
+#endif
     }
 
     private bool CompareClosestPlayerToBall(PlayerController currentPlayer, PlayerController targetPlayer)
@@ -182,6 +190,23 @@ public class TeamController : MonoBehaviour
         userInput.SetControlledPlayer(player);
     }
 
+    public void SetAllTeamPlayer()
+    {
+        PlayerList = new List<GameObject>();
+
+        for (int i = 0; i < transform.childCount; i++)
+        {
+            Transform childTransform = transform.GetChild(i);
+
+            GameObject childObject = childTransform.gameObject;
+
+            if (childObject.tag == PLAYER_TAG)
+            {
+                PlayerList.Add(childObject);
+            }
+        }
+    }
+
     public void SetPlayerList(List<GameObject> targetPlayerList)
     {
         PlayerList = targetPlayerList;
@@ -190,12 +215,21 @@ public class TeamController : MonoBehaviour
         {
             PlayerController playerController = player.GetComponent<PlayerController>();
 
-            player.transform.parent = this.transform;
+            NetworkObject networkObject = player.GetComponent<NetworkObject>();
+
+            if (networkObject != null && networkObject.IsSpawned)
+            {
+                player.transform.SetParent(this.transform);
+            }
+/*            else
+            {
+                networkObject?.Spawn();
+                player.transform.SetParent(this.transform);
+            }*/
 
             player.name = playerController.Role.ToString() + " " + PlayerList.IndexOf(player);
-            
-            Vector2 newPos = formationController.GetWorldPositionByOffset(playerController.defaultOffset);
 
+            Vector2 newPos = formationController.GetWorldPositionByOffset(playerController.defaultOffset);
             playerController.SetPosition(newPos);
         }
 

@@ -3,44 +3,45 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    public static GameController Instance { get; private set; }
+    public static GameController Singleton { get; private set; }
 
     public float CurrentFPS;
 
-    [field: SerializeField] public GameObject ball { get; private set; }
-    [field: SerializeField] public GameObject playerPrefab { get; private set; }
 
-    [field: SerializeField] public GameObject teamOneGoal { get; private set; }
-    [field: SerializeField] public GameObject teamTwoGoal { get; private set; }
+    [field: SerializeField] public GameObject Ball { get; private set; }
+    [field: SerializeField] public GameObject PlayerPrefab { get; private set; }
 
-    [field: SerializeField] public TeamController teamOneController { get; private set; }
-    [field: SerializeField] public TeamController teamTwoController { get; private set; }
+
+    [field: Header("Enviroment")]
+    [SerializeField] private GameObject teamOneGoal;
+    [SerializeField] private GameObject teamTwoGoal;
+    [SerializeField] private Transform upperWall;
+    [SerializeField] private Transform lowerWall;
+    [SerializeField] private Transform leftWall;
+    [SerializeField] private Transform rightWall;
+    [SerializeField] private GameObject field;
+
+    [field: SerializeField] public TeamController TeamOneController { get; private set; }
+    [field: SerializeField] public TeamController TeamTwoController { get; private set; }
 
     public PlayerController PlayerHasBall { get; private set; }
 
-    public GameObject Field;
 
     private void Awake()
     {
         Application.targetFrameRate = 60;
 
-        if (Instance != null && Instance != this)
+        if (Singleton != null && Singleton != this)
         {
             Destroy(this);
         }
         else
         {
-            Instance = this;
+            Singleton = this;
         }
-
-        teamOneController.IsTeamOne = true;
-        teamTwoController.IsTeamOne = false;
-
-
-
-        // teamTwoController = GetComponent<TeamController>();
     }
 
+    // TODO This can put into player data -> select favorite color
     private void SetTeamColor(TeamController team, Color color)
     {
         foreach (GameObject player in team.PlayerList)
@@ -51,18 +52,46 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        GeneratePlayer.GeneratePlayerByTeam(teamOneController);
-        GeneratePlayer.GeneratePlayerByTeam(teamTwoController);
+        //GeneratePlayer.GeneratePlayerByTeam(teamOneController);
+        //GeneratePlayer.GeneratePlayerByTeam(teamTwoController);
 
-        SetTeamColor(teamOneController, Color.red);
-        SetTeamColor(teamTwoController, Color.green);
+        //SetTeamColor(teamOneController, Color.red);
+        //SetTeamColor(teamTwoController, Color.green);
     }
 
     private void Update()
     {
-        CurrentFPS = 1.0f / Time.deltaTime;
+        CurrentFPS = Mathf.Round(1.0f / Time.deltaTime);
     }
 
+    public void SpawnPlayer(TeamController teamController)
+    {
+        if (teamController.IsTeamOne)
+        {
+            GeneratePlayer.GeneratePlayerByTeam(teamController);
+            SetTeamController(teamController);
+        }
+        else
+        {
+            GeneratePlayer.GeneratePlayerByTeam(teamController);
+            SetTeamController(teamController);
+        }
+    }
+
+
+    public void SetTeamController(TeamController teamController)
+    {
+        if (teamController.IsTeamOne)
+        {
+            TeamOneController = teamController;
+            SetTeamColor(TeamOneController, Color.red);
+        }
+        else
+        {
+            TeamTwoController = teamController;
+            SetTeamColor(TeamTwoController, Color.green);
+        }
+    }
 
     public void SetPlayerHasBall(PlayerController player)
     {
@@ -70,6 +99,7 @@ public class GameController : MonoBehaviour
  
         if (player != null)
         {
+            // TODO Change this
             StartCoroutine(player.DribblingBall());
         }
         else
@@ -99,10 +129,10 @@ public class GameController : MonoBehaviour
     {
         if (isTeamOne)
         {
-            return teamTwoController.PlayerList;
+            return TeamTwoController.PlayerList;
         }else
         {
-            return teamOneController.PlayerList;
+            return TeamOneController.PlayerList;
         }
     }
 
@@ -110,11 +140,11 @@ public class GameController : MonoBehaviour
     {
         if (!isTeamOne)
         {
-            return teamTwoController.PlayerList;
+            return TeamTwoController.PlayerList;
         }
         else
         {
-            return teamOneController.PlayerList;
+            return TeamOneController.PlayerList;
         }
     }
 
@@ -123,6 +153,14 @@ public class GameController : MonoBehaviour
         Vector2 goalPos = !isTeamOne ? teamOneGoal.transform.position : teamTwoGoal.transform.position;
 
         return Vector2.Distance(goalPos, playerController.transform.position);
+    }
+
+    public Vector2 GetDirectionToGoal(bool isTeamOne, PlayerController playerController)
+    {
+        Vector2 goalPos = !isTeamOne ? teamOneGoal.transform.position : teamTwoGoal.transform.position;
+        Vector2 playerPos = playerController.transform.position;
+        Vector2 shootingDirection = goalPos - playerPos;
+        return shootingDirection.normalized;
     }
 
     public Transform GetGoal(bool isTeamOne)
