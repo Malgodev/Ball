@@ -64,7 +64,7 @@ public class FormationAI : NetworkBehaviour
         base.OnNetworkSpawn();
 
         formationController = GetComponent<FormationController>();
-        ball = GameController.Singleton.Ball.transform;
+        ball = GameController.Instance.Ball.transform;
 
         if (!IsTeamOne)
         {
@@ -94,7 +94,7 @@ public class FormationAI : NetworkBehaviour
     }
     private void UpdateCompressionBalance()
     {
-        ETeamHasBall teamHasBall = GameController.Singleton.GetTeamHasBall();
+        ETeamHasBall teamHasBall = GameController.Instance.GetTeamHasBall();
 
         bool havingBall = (teamHasBall == ETeamHasBall.TeamOne && IsTeamOne) || 
                 (teamHasBall == ETeamHasBall.TeamTwo && !IsTeamOne);
@@ -161,7 +161,7 @@ public class FormationAI : NetworkBehaviour
             target.x = Mathf.Lerp(Middle, UpperLimit - deltaX, smoothedPossessionBalance);
         }
 
-        Transform ballTransform = GameController.Singleton.Ball.transform;
+        Transform ballTransform = GameController.Instance.Ball.transform;
 
         target.y = ballTransform.position.y;
 
@@ -174,7 +174,7 @@ public class FormationAI : NetworkBehaviour
     {
         // TODO Put this into switch case of ETeamState
 
-        ETeamHasBall teamHasBall = GameController.Singleton.GetTeamHasBall();
+        ETeamHasBall teamHasBall = GameController.Instance.GetTeamHasBall();
 
         if (teamHasBall == ETeamHasBall.None)
         {

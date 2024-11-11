@@ -113,7 +113,7 @@ public class GeneratePlayer : MonoBehaviour
 
     static GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
     {
-        GameObject newPlayer = Instantiate(GameController.Singleton.PlayerPrefab);
+        GameObject newPlayer = Instantiate(GameController.Instance.PlayerPrefab);
         PlayerController playerController = newPlayer.GetComponent<PlayerController>();
         playerController.SetRole(role);
 

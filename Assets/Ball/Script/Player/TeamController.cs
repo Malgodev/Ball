@@ -51,7 +51,7 @@ public class TeamController : NetworkBehaviour
         base.OnNetworkSpawn();
 
         // GameController.Singleton.SpawnPlayer(this);
-        ball = GameController.Singleton.Ball;
+        ball = GameController.Instance.Ball;
 
         this.gameObject.name = "Team" + (IsTeamOne ? "One" : "Two");
 
@@ -74,7 +74,7 @@ public class TeamController : NetworkBehaviour
             return;
         }
 
-        PlayerController playerHasBall = GameController.Singleton.PlayerHasBall;
+        PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
 
         foreach (GameObject player in PlayerList)
         {
@@ -103,7 +103,7 @@ public class TeamController : NetworkBehaviour
         if (playerController == playerHasBall)
         {
             // Here to, change singleton to get distance from current goal
-            if (PossessionRate >= 0.9f && GameController.Singleton.GetDistanceToGoal(IsTeamOne, playerController) < 10f)
+            if (PossessionRate >= 0.9f && GameController.Instance.GetDistanceToGoal(IsTeamOne, playerController) < 10f)
             {
                 playerController.SetPlayerState(EPlayerState.Shot);
             }

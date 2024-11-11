@@ -73,7 +73,7 @@ public class PlayerController : NetworkBehaviour
         base.OnNetworkSpawn();
 
         IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
-        ball = GameController.Singleton.Ball;
+        ball = GameController.Instance.Ball;
     }
 
     void Update()
@@ -155,10 +155,10 @@ public class PlayerController : NetworkBehaviour
                 ChallengeBall();
                 break;
             case EPlayerState.Shot:
-                ShotBall(GameController.Singleton.Ball);
+                ShotBall(GameController.Instance.Ball);
                 break;
             case EPlayerState.Pass:
-                PassBall(GameController.Singleton.Ball);
+                PassBall(GameController.Instance.Ball);
                 break;
             case EPlayerState.RunToBall:
                 RunToBall();
@@ -170,7 +170,7 @@ public class PlayerController : NetworkBehaviour
 
     private float GetTimeToReachBall()
     {
-        BallMovement ballMovement = GameController.Singleton.Ball.GetComponent<BallMovement>();
+        BallMovement ballMovement = GameController.Instance.Ball.GetComponent<BallMovement>();
 
         if (ballMovement.PredictPos.Count == 0)
         {
@@ -268,12 +268,12 @@ public class PlayerController : NetworkBehaviour
     {
         // TODO Change ball object logic, not stick to player -> ball will be kicked away and repeat
 
-        PlayerController playerHasBall = GameController.Singleton.PlayerHasBall;
+        PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
 
 
         while (playerHasBall && playerHasBall.Equals(this))
         {
-            playerHasBall = GameController.Singleton.PlayerHasBall;
+            playerHasBall = GameController.Instance.PlayerHasBall;
 
             Vector3 BallPos = transform.position;
             BallPos += transform.right * 1f;
@@ -286,7 +286,7 @@ public class PlayerController : NetworkBehaviour
 
     public void ChallengeBall()
     {
-        PlayerController playerHasBall = GameController.Singleton.PlayerHasBall;
+        PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
 
         if (!playerHasBall)
         {
@@ -307,9 +307,9 @@ public class PlayerController : NetworkBehaviour
     // TODO Code to check how long the key has pressed -> convert to force
     public void ShotBall(GameObject ball)
     {
-        GameController.Singleton.SetPlayerHasBall(null);
+        GameController.Instance.SetPlayerHasBall(null);
 
-        Vector2 shootingDirection = GameController.Singleton.GetDirectionToGoal(IsTeamOne, this);
+        Vector2 shootingDirection = GameController.Instance.GetDirectionToGoal(IsTeamOne, this);
 
         transform.rotation = GetRotationByDirection(shootingDirection);
 
@@ -332,7 +332,7 @@ public class PlayerController : NetworkBehaviour
         Vector2 passingDirection = (targetPass.transform.position - transform.position);
         passingDirection.Normalize();
 
-        GameController.Singleton.SetPlayerHasBall(null);
+        GameController.Instance.SetPlayerHasBall(null);
 
         transform.rotation = GetRotationByDirection(passingDirection);
 
@@ -408,7 +408,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (collision.gameObject.CompareTag(BallMovement.BallTag))
         {
-            GameController.Singleton.SetPlayerHasBall(this);
+            GameController.Instance.SetPlayerHasBall(this);
         }
     }
 

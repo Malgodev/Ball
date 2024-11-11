@@ -22,11 +22,10 @@ public class BallNetworkManager : NetworkManager
 
     private void OnServerStarted()
     {
-        Debug.Log("Server started!");
     }
 
     private void OnPlayerConnected(ulong clientId)
     {
-        Debug.Log(clientId);
+        
     }
 }

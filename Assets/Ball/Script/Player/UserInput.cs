@@ -53,9 +53,9 @@ public class UserInput : NetworkBehaviour
 
     public void ShotBall()
     {
-        if (controlledPlayer == GameController.Singleton.PlayerHasBall)
+        if (controlledPlayer == GameController.Instance.PlayerHasBall)
         {
-            controlledPlayer.ShotBall(GameController.Singleton.Ball);
+            controlledPlayer.ShotBall(GameController.Instance.Ball);
         }
     }
 

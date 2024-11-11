@@ -1697,7 +1697,7 @@ Transform:
   m_GameObject: {fileID: 4713533612305223403}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
-  m_LocalPosition: {x: -23, y: 5, z: 0}
+  m_LocalPosition: {x: -23, y: 0, z: 0}
   m_LocalScale: {x: 55, y: 50, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1768,7 +1768,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsTeamOne: 0
-  <formationPosition>k__BackingField: {x: -23, y: 5}
+  <formationPosition>k__BackingField: {x: -23, y: 0}
   <formationScale>k__BackingField: {x: 55, y: 50}
 --- !u!114 &6185779597833091447
 MonoBehaviour:
