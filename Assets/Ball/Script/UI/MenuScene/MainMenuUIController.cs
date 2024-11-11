@@ -1,11 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
-using static GameController;
 
 public class MainMenuUIController : NetworkBehaviour
 {

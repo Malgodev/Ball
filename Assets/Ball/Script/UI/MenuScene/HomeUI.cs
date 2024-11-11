@@ -31,6 +31,7 @@ public class HomeUI : NetworkBehaviour
 
     private void MainMenuController_OnMenuStateChanged(object sender, System.EventArgs e)
     {
+        // ? thừa
         if (MainMenuUIController.Instance.State == MainMenuUIController.EMainMenuState.Home)
         {
             Show();

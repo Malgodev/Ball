@@ -145,6 +145,11 @@ public class TeamController : NetworkBehaviour
         {
             PlayerController playerController = PlayerList[i].GetComponent<PlayerController>();
 
+            if (playerController.Role == EPlayerRole.Goalkeeper)
+            {
+                continue;
+            }
+
             if (CompareClosestPlayerToBall(newClosestToBall, playerController))
             {
                 newClosestToBall = playerController;
