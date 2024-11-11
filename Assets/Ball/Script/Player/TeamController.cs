@@ -7,7 +7,7 @@ using UnityEngine.LowLevel;
 [Serializable]
 public class TeamController : NetworkBehaviour
 {
-    public bool IsTeamOne = false;
+    [field: SerializeField] public bool IsTeamOne { get; private set; } = false;
     [field: Header("Enviroment")]
     private GameObject ball;
     private GameObject targetGoal;
@@ -67,6 +67,11 @@ public class TeamController : NetworkBehaviour
     // From that, player will automaticly move by that state
     private void Update()
     {
+        if (GameController.Instance.State.Value != GameController.GameState.GamePlaying)
+        {
+            return;
+        }
+        
         updateCounter++;
         if (updateCounter >= 5)
         {
@@ -211,6 +216,39 @@ public class TeamController : NetworkBehaviour
                 PlayerList.Add(childObject);
             }
         }
+    }
+
+    public void SetIsTeamOne(bool isTeamOne)
+    {
+        IsTeamOne = isTeamOne;
+    }
+
+    public void SetIsControlledPlayer(bool isControlledPlayer)
+    {
+        IsControlledPlayer = isControlledPlayer;
+        SetControlledPlayer(null);
+    }
+
+    public void SetFormationRec(bool isTeamOne)
+    {
+        Vector2 pos;
+        Quaternion rot;
+        Vector2 scale;
+
+        if (isTeamOne)
+        {
+            pos = new Vector2(-23, 0);
+            rot = Quaternion.Euler(0, 0, 0);
+            scale = new Vector2(55, 50);
+        }
+        else
+        {
+            pos = new Vector2(23, 0);
+            rot = Quaternion.Euler(0, 0, 180);
+            scale = new Vector2(55, 50);
+        }
+
+        formationController.SetFormationRectTransform(pos, rot, scale);
     }
 
     // Outdated

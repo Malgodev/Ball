@@ -13,7 +13,6 @@ public class BallGameMultiplayer : NetworkBehaviour
     public static BallGameMultiplayer Instance { get; private set; }
 
     public NetworkList<UserData> UserDataList { get; private set; }
-
     public event EventHandler OnUserDataChanged;
 
     private void Awake()
@@ -60,6 +59,8 @@ public class BallGameMultiplayer : NetworkBehaviour
         NetworkManager.Singleton.StartClient();
     }
 
-    // TODO put other network thing to here
-    // TODO put spawn formation to here
+    public UserData GetUserDataByClientId(ulong clientId)
+    {
+        return UserDataList[(int) clientId];
+    }
 }

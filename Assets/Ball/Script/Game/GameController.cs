@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class GameController : NetworkBehaviour
 {
@@ -14,6 +11,7 @@ public class GameController : NetworkBehaviour
     [field: Header("Prefab")]
     [field: SerializeField] public GameObject Ball { get; private set; }
     [field: SerializeField] public GameObject PlayerPrefab { get; private set; }
+    [field: SerializeField] public GameObject TeamPrefab { get; private set; }
 
 
     [field: Header("Enviroment")]
@@ -87,6 +85,50 @@ public class GameController : NetworkBehaviour
         {
             OnStateChanged?.Invoke(this, EventArgs.Empty);
         };
+
+        if (IsServer)
+        {
+            NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
+        }
+    }
+
+    private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
+    {
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            UserData clientData = BallGameMultiplayer.Instance.GetUserDataByClientId(clientId);
+
+            GameObject teamGameObject = Instantiate(TeamPrefab);
+            teamGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+            TeamController teamController = teamGameObject.GetComponent<TeamController>();
+            if (clientId == 0)
+            {
+                teamGameObject.name = "TeamOne";
+                teamController.SetIsTeamOne(true);
+                teamController.SetIsControlledPlayer(true);
+                teamController.SetFormationRec(true);
+                TeamOneController = teamGameObject.GetComponent<TeamController>();
+            }
+            else if (clientId == 1)
+            {
+                teamGameObject.name = "TeamTwo";
+                teamController.SetIsTeamOne(false);
+                teamController.SetIsControlledPlayer(true);
+                teamController.SetFormationRec(false);
+                TeamTwoController = teamGameObject.GetComponent<TeamController>();
+            }
+        }
+
+        //if (TeamTwoController == null)
+        //{
+        //    GameObject teamGameObject = Instantiate(TeamPrefab);
+        //    teamGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(0, true);
+        //    TeamController teamController = teamGameObject.GetComponent<TeamController>();
+
+        //    teamController.SetIsTeamOne(false);
+        //    teamController.SetIsControlledPlayer(false);
+        //    TeamTwoController = teamGameObject.GetComponent<TeamController>();
+        //}
     }
 
     private void Start()

@@ -30,7 +30,6 @@ public class FormationController : NetworkBehaviour
 
     private void Update()
     {
-        Debug.Log("Updating " + formationPosition + " " + formationScale);
         formationRectangle.position = formationPosition;
         formationRectangle.localScale = formationScale;
     }
@@ -103,6 +102,15 @@ public class FormationController : NetworkBehaviour
         offset.y = ((worldPosition.y - formationPosition.y) + formationScale.y / 2) * 100 / formationScale.y;
 
         return offset;
+    }
+
+    public void SetFormationRectTransform(Vector2 pos, Quaternion rot, Vector2 scale)
+    {
+        formationRectangle.position = pos;
+        formationPosition = pos;
+        formationRectangle.rotation = rot;
+        formationScale = scale;
+        formationRectangle.localScale = scale;
     }
 
 #if UNITY_EDITOR
