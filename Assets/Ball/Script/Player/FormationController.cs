@@ -9,23 +9,30 @@ public class FormationController : NetworkBehaviour
     [field: SerializeField] public Vector2 formationPosition { get; private set; }
     [field: SerializeField] public Vector2 formationScale { get; private set; }
 
-    public ETeamState curState { get; private set; }
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
-        IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
+        formationRectangle = this.transform;
+    }
 
-        if (IsTeamOne)
+    // TODO make this sync on every client
+    public void InitFormationController(bool isTeamOne)
+    {
+        IsTeamOne = isTeamOne;
+
+        if (isTeamOne)
         {
-            formationPosition = new Vector2(formationPosition.x + 10f, formationPosition.y);
+            formationPosition = new Vector3(-23, 5, -1);
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            formationScale = new Vector3(55, 50, 0);
         }
-
-        formationRectangle = GetComponent<Transform>();
-
-        formationPosition = transform.position;
-        formationScale = transform.localScale;
+        else
+        {
+            formationPosition = new Vector3(23, 5, -1);
+            transform.rotation = Quaternion.Euler(0, 0, 180);
+            formationScale = new Vector3(55, 50, 0);
+        }
     }
 
     private void Update()
@@ -52,31 +59,6 @@ public class FormationController : NetworkBehaviour
     {
         formationPosition = newPosition;
         formationScale = newScale;
-    }
-    
-    public void SetFormationRectangle(float PossessionBalance, float Compression)
-    {
-        // SetFormationPosition(new Vector2(PossessionBalance * (55 - formationScale.x), 0));
-
-        //Vector2 newPos = new Vector2();
-
-        //Debug.Log(IsTeamOne + " " + PossessionBalance);
-
-        //if (PossessionBalance <= 0f)
-        //{
-        //    newPos.x = Mathf.Lerp(LowerLimit, Middle, (PossessionBalance + 1f) / 1f);
-
-        //}
-        //else
-        //{
-        //    newPos.x = Mathf.Lerp(Middle, UpperLimit, PossessionBalance);
-        //}
-
-        //newPos.x = newPos.x + (IsTeamOne ? -1 : 1) * formationScale.x;
-
-        //SetFormationPosition(newPos);
-
-        Vector2 targetPos = new Vector2();
     }
 
     // offset is a percentage of formation rectangle

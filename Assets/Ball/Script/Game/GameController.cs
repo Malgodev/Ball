@@ -12,6 +12,7 @@ public class GameController : NetworkBehaviour
     [field: SerializeField] public GameObject Ball { get; private set; }
     [field: SerializeField] public GameObject PlayerPrefab { get; private set; }
     [field: SerializeField] public GameObject TeamPrefab { get; private set; }
+    [field: SerializeField] public GameObject EmptyTeamPrefab { get; private set; }
 
 
     [field: Header("Enviroment")]
@@ -92,43 +93,50 @@ public class GameController : NetworkBehaviour
         }
     }
 
+    // Default team one
+    // Pos -23 5 -1
+    // Rot 0 0 0
+    // Sca 55 50 1
+    // Default team two
+    // Pos -23 -5 -1
+    // Rot 0 0 180
+    // Sca 55 50 1
+
     private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
             UserData clientData = BallGameMultiplayer.Instance.GetUserDataByClientId(clientId);
 
-            GameObject teamGameObject = Instantiate(TeamPrefab);
+            GameObject teamGameObject = Instantiate(EmptyTeamPrefab);
             teamGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
             TeamController teamController = teamGameObject.GetComponent<TeamController>();
+
             if (clientId == 0)
             {
-                teamGameObject.name = "TeamOne";
-                teamController.SetIsTeamOne(true);
-                teamController.SetIsControlledPlayer(true);
-                teamController.SetFormationRec(true);
-                TeamOneController = teamGameObject.GetComponent<TeamController>();
+                teamController.SetTeamInfo(true, false);
+                // teamController.SetTeamInfo(true, true);
+                TeamOneController = teamController;
             }
-            else if (clientId == 1)
+            else
             {
-                teamGameObject.name = "TeamTwo";
-                teamController.SetIsTeamOne(false);
-                teamController.SetIsControlledPlayer(true);
-                teamController.SetFormationRec(false);
-                TeamTwoController = teamGameObject.GetComponent<TeamController>();
+                Debug.Log("spawn new stuff");
+                teamController.SetTeamInfo(false, false);
+                TeamTwoController = teamController;
             }
         }
 
-        //if (TeamTwoController == null)
-        //{
-        //    GameObject teamGameObject = Instantiate(TeamPrefab);
-        //    teamGameObject.GetComponent<NetworkObject>().SpawnAsPlayerObject(0, true);
-        //    TeamController teamController = teamGameObject.GetComponent<TeamController>();
+        if (TeamTwoController == null)
+        {
+            GameObject teamGameObject = Instantiate(EmptyTeamPrefab);
+            teamGameObject.GetComponent<NetworkObject>().Spawn(true);
+            TeamController teamController = teamGameObject.GetComponent<TeamController>();
 
-        //    teamController.SetIsTeamOne(false);
-        //    teamController.SetIsControlledPlayer(false);
-        //    TeamTwoController = teamGameObject.GetComponent<TeamController>();
-        //}
+            teamController.SetTeamInfo(false, false);
+            //teamController.SetIsTeamOne(false);
+            //teamController.SetIsControlledPlayer(false);
+            TeamTwoController = teamController;
+        }
     }
 
     private void Start()
@@ -136,7 +144,7 @@ public class GameController : NetworkBehaviour
         //SetTeamColor(teamOneController, Color.red);
         //SetTeamColor(teamTwoController, Color.green);
 
-        
+
     }
 
     public void ReadyToPlay()
@@ -177,7 +185,7 @@ public class GameController : NetworkBehaviour
         }
     }
 
-    
+
 
     public void SpawnPlayer(TeamController teamController)
     {
@@ -246,7 +254,7 @@ public class GameController : NetworkBehaviour
     public void SetPlayerHasBall(PlayerController player)
     {
         PlayerHasBall = player;
- 
+
         if (player != null)
         {
             // TODO Change this
@@ -264,7 +272,7 @@ public class GameController : NetworkBehaviour
         {
             return ETeamHasBall.None;
         }
-        
+
         if (PlayerHasBall.GetComponent<PlayerController>().IsTeamOne)
         {
             return ETeamHasBall.TeamOne;
@@ -280,7 +288,8 @@ public class GameController : NetworkBehaviour
         if (isTeamOne)
         {
             return TeamTwoController.PlayerList;
-        }else
+        }
+        else
         {
             return TeamOneController.PlayerList;
         }

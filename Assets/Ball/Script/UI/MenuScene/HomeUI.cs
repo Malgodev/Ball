@@ -13,26 +13,26 @@ public class HomeUI : NetworkBehaviour
     {
         createLobbyBtn.onClick.AddListener(() =>
         {
-            MainMenuUIController.Instance.SetState(MainMenuUIController.EMainMenuState.Lobby);
+            MainMenuController.Instance.SetState(MainMenuController.EMainMenuState.Lobby);
             BallGameMultiplayer.Instance.StartHost();
         });
 
         joinLobbyBtn.onClick.AddListener(() =>
         {
-            MainMenuUIController.Instance.SetState(MainMenuUIController.EMainMenuState.Lobby);
+            MainMenuController.Instance.SetState(MainMenuController.EMainMenuState.Lobby);
             BallGameMultiplayer.Instance.StartClient();
         });
     }
 
     private void Start()
     {
-        MainMenuUIController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
+        MainMenuController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
     }
 
     private void MainMenuController_OnMenuStateChanged(object sender, System.EventArgs e)
     {
         // ? thừa
-        if (MainMenuUIController.Instance.State == MainMenuUIController.EMainMenuState.Home)
+        if (MainMenuController.Instance.State == MainMenuController.EMainMenuState.Home)
         {
             Show();
         }

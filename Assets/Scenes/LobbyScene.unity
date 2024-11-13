@@ -1481,7 +1481,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1392040924}
   - component: {fileID: 1392040926}
-  - component: {fileID: 1392040925}
+  - component: {fileID: 1392040927}
   m_Layer: 5
   m_Name: MainMenuUI
   m_TagString: Untagged
@@ -1510,20 +1510,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1392040925
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1392040923}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc14e8ab924220847824f53354b54dae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  homePanel: {fileID: 2071887287}
-  lobbyPanel: {fileID: 1843599927}
 --- !u!114 &1392040926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1545,6 +1531,20 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &1392040927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1392040923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4eb5705f36db1347b03deef4bfc292b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  homePanel: {fileID: 2071887287}
+  lobbyPanel: {fileID: 1843599927}
 --- !u!1 &1452987271
 GameObject:
   m_ObjectHideFlags: 0

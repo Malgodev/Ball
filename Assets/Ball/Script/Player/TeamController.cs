@@ -55,18 +55,30 @@ public class TeamController : NetworkBehaviour
 
         this.gameObject.name = "Team" + (IsTeamOne ? "One" : "Two");
 
-        SetAllTeamPlayer();
+        // SetAllTeamPlayer();
 
-        if (IsControlledPlayer)
-        {
-            SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
-        }
+        //if (IsControlledPlayer)
+        //{
+        //    SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
+        //}
     }
 
     // Mostly use for set player state
     // From that, player will automaticly move by that state
     private void Update()
     {
+        if (IsOwner)
+        {
+            if (Input.GetAxisRaw("Horizontal") != 0)
+            {
+                this.gameObject.name = "Bruh";
+            }
+            else
+            {
+                this.gameObject.name = "Not bruh";
+            }
+        }
+
         if (GameController.Instance.State.Value != GameController.GameState.GamePlaying)
         {
             return;
@@ -193,6 +205,22 @@ public class TeamController : NetworkBehaviour
         return false;
     }
 
+    #region Setter
+    public void SetTeamInfo(bool isTeamOne, bool isControlled)
+    {
+        IsTeamOne = isTeamOne;
+
+        gameObject.name = "Team" + (IsTeamOne ? "One" : "Two");
+
+        IsControlledPlayer = isControlled;
+
+        formationController.InitFormationController(IsTeamOne);
+        formationAI.InitFormationAI(IsTeamOne);
+
+        // formationController.
+    }
+
+
     public void SetControlledPlayer(PlayerController player)
     {
         if (ControlledPlayer != null)
@@ -223,15 +251,10 @@ public class TeamController : NetworkBehaviour
         }
     }
 
-    public void SetIsTeamOne(bool isTeamOne)
-    {
-        IsTeamOne = isTeamOne;
-    }
-
     public void SetIsControlledPlayer(bool isControlledPlayer)
     {
         IsControlledPlayer = isControlledPlayer;
-        SetControlledPlayer(null);
+        // SetControlledPlayer(null);
     }
 
     public void SetFormationRec(bool isTeamOne)
@@ -288,4 +311,5 @@ public class TeamController : NetworkBehaviour
             SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
         }
     }
+    #endregion
 }

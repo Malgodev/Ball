@@ -65,7 +65,12 @@ public class FormationAI : NetworkBehaviour
 
         formationController = GetComponent<FormationController>();
         ball = GameController.Instance.Ball.transform;
+    }
 
+    // TODO make this sync on every client
+    public void InitFormationAI(bool isTeamOne)
+    {
+        IsTeamOne = isTeamOne;
         if (!IsTeamOne)
         {
             LowerLimit = -LowerLimit;
@@ -77,6 +82,8 @@ public class FormationAI : NetworkBehaviour
 
     private void Update()
     {
+        return;
+
         if (frameCounter++ >= UPDATED_FRAME_INTERVAL)
         {
             UpdatePossessionBalance();
@@ -87,6 +94,8 @@ public class FormationAI : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        return;
+
         formationController.SetFormationPosition(ConvertPossessionToPosition(smoothedPossessionBalance));
         formationController.SetFormationScale(ConvertStateToScale(teamState));
 

@@ -28,26 +28,27 @@ public class LobbyUI : NetworkBehaviour
         returnBtn.onClick.AddListener(() =>
         {
             NetworkManager.Singleton.Shutdown();
-            MainMenuUIController.Instance.SetState(MainMenuUIController.EMainMenuState.Home);
+            MainMenuController.Instance.SetState(MainMenuController.EMainMenuState.Home);
         });
 
         readyBtn.onClick.AddListener(() =>
         {
-            MainMenuUIController.Instance.SetLocalPlayerReady(true);
+            MainMenuController.Instance.SetLocalPlayerReady();
         });
     }
 
     private void Start()
     {
-        MainMenuUIController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
-        MainMenuUIController.Instance.OnReadyChanged += MainMenyController_OnReadyChanged;
+        MainMenuController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
+        MainMenuController.Instance.OnReadyChanged += MainMenyController_OnReadyChanged;
         BallGameMultiplayer.Instance.OnUserDataChanged += BallGameMultiplayer_OnUserDataChanged;
+        BallGameMultiplayer.Instance.OnUserDataChanged += MainMenyController_OnReadyChanged;
     }
 
     private void MainMenyController_OnReadyChanged(object sender, System.EventArgs e)
     {
-        bool isPlayerOneReady = MainMenuUIController.Instance.IsPlayerReady(0);
-        bool isPlayerTwoReady = MainMenuUIController.Instance.IsPlayerReady(1);
+        bool isPlayerOneReady = MainMenuController.Instance.IsPlayerReady(0);
+        bool isPlayerTwoReady = MainMenuController.Instance.IsPlayerReady(1);
 
         playerOneIsReadyTxt.text = isPlayerOneReady ? "Ready" : "Not ready";
         playerTwoIsReadyTxt.text = isPlayerTwoReady ? "Ready" : "Not ready";
@@ -78,7 +79,7 @@ public class LobbyUI : NetworkBehaviour
     private void MainMenuController_OnMenuStateChanged(object sender, System.EventArgs e)
     {
         // ? thừa
-        if (MainMenuUIController.Instance.State == MainMenuUIController.EMainMenuState.Lobby)
+        if (MainMenuController.Instance.State == MainMenuController.EMainMenuState.Lobby)
         {
             Show();
         }
