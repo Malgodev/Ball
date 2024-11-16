@@ -1,33 +1,27 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
-public class UserInput : MonoBehaviour
+public class UserInput : NetworkBehaviour
 {
-    private PlayerController controlledPlayer;
+    public Vector2 InputVector { get; private set; }
 
-    public Vector2 inputVector { get; private set; }
+    public EPlayerState InputState = EPlayerState.Run;
 
     private void Awake()
     {
-        controlledPlayer = null;
-
-        inputVector = Vector2.zero;
-    }
-
-    void Start()
-    {
-
+        InputVector = Vector2.zero;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (controlledPlayer == null)
+        if (!NetworkObject.IsOwner)
         {
             return;
         }
 
-        inputVector = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        InputVector = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
         if (Input.GetKeyDown(KeyCode.J))
         {
@@ -37,24 +31,16 @@ public class UserInput : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (controlledPlayer == null)
-        {
-            return;
-        }
+        //if (controlledPlayer == null)
+        //{
+        //    return;
+        //}
 
-        controlledPlayer.MoveByAxis(inputVector);
+        //controlledPlayer.MoveByAxis(InputVector);
     }
 
-    public void ShotBall()
+    private void ShotBall()
     {
-        if (controlledPlayer == GameController.Instance.PlayerHasBall)
-        {
-            controlledPlayer.ShotBall(GameController.Instance.ball);
-        }
-    }
-
-    public void SetControlledPlayer(PlayerController playerController)
-    {
-        controlledPlayer = playerController;
+        InputState = EPlayerState.Shot;
     }
 }

@@ -1,11 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEditor.SceneTemplate;
+using Unity.Netcode;
 using UnityEngine;
-using static UnityEngine.EventSystems.EventTrigger;
 
-public class FormationController : MonoBehaviour
+public class FormationController : NetworkBehaviour
 {
     public bool IsTeamOne = false;
 
@@ -13,26 +9,30 @@ public class FormationController : MonoBehaviour
     [field: SerializeField] public Vector2 formationPosition { get; private set; }
     [field: SerializeField] public Vector2 formationScale { get; private set; }
 
-    public ETeamState curState { get; private set; }
-
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
-        //#if UNITY_EDITOR
-        //        this.GetComponent<SpriteRenderer>().enabled = true;
-        //#endif
+        base.OnNetworkSpawn();
 
-        formationRectangle = GetComponent<Transform>();
-
-
-        formationPosition = transform.position;
-        formationScale = transform.localScale;
+        formationRectangle = this.transform;
     }
 
-    private void Start()
+    // TODO make this sync on every client
+    [ClientRpc]
+    public void InitFormationControllerClientRpc(bool isTeamOne)
     {
-        if (IsTeamOne)
+        IsTeamOne = isTeamOne;
+
+        if (isTeamOne)
         {
-            formationPosition = new Vector2(formationPosition.x + 10f, formationPosition.y);
+            formationPosition = new Vector3(-23, 5, -1);
+            transform.rotation = Quaternion.Euler(0, 0, 0);
+            formationScale = new Vector3(55, 50, 0);
+        }
+        else
+        {
+            formationPosition = new Vector3(23, 5, -1);
+            transform.rotation = Quaternion.Euler(0, 0, 180);
+            formationScale = new Vector3(55, 50, 0);
         }
     }
 
@@ -61,31 +61,6 @@ public class FormationController : MonoBehaviour
         formationPosition = newPosition;
         formationScale = newScale;
     }
-    
-    public void SetFormationRectangle(float PossessionBalance, float Compression)
-    {
-        // SetFormationPosition(new Vector2(PossessionBalance * (55 - formationScale.x), 0));
-
-        //Vector2 newPos = new Vector2();
-
-        //Debug.Log(IsTeamOne + " " + PossessionBalance);
-
-        //if (PossessionBalance <= 0f)
-        //{
-        //    newPos.x = Mathf.Lerp(LowerLimit, Middle, (PossessionBalance + 1f) / 1f);
-
-        //}
-        //else
-        //{
-        //    newPos.x = Mathf.Lerp(Middle, UpperLimit, PossessionBalance);
-        //}
-
-        //newPos.x = newPos.x + (IsTeamOne ? -1 : 1) * formationScale.x;
-
-        //SetFormationPosition(newPos);
-
-        Vector2 targetPos = new Vector2();
-    }
 
     // offset is a percentage of formation rectangle
     public Vector2 GetWorldPositionByOffset(Vector2 offset)
@@ -100,10 +75,33 @@ public class FormationController : MonoBehaviour
         return result;
     }
 
+    public Vector2 GetOffsetByWorldPosition(Vector2 worldPosition)
+    {
+        Vector2 offset = Vector2.zero;
+
+        int delta = IsTeamOne ? 1 : -1;
+
+        offset.x = ((worldPosition.x - formationPosition.x) / delta + formationScale.x / 2) * 100 / formationScale.x;
+        offset.y = ((worldPosition.y - formationPosition.y) + formationScale.y / 2) * 100 / formationScale.y;
+
+        return offset;
+    }
+
+    public void SetFormationRectTransform(Vector2 pos, Quaternion rot, Vector2 scale)
+    {
+        formationRectangle.position = pos;
+        formationPosition = pos;
+        formationRectangle.rotation = rot;
+        formationScale = scale;
+        formationRectangle.localScale = scale;
+    }
+
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         Color color = IsTeamOne ? Color.blue : Color.red;
 
-        GizmosExtra.DrawWireRectangle(formationPosition, formationScale.x, formationScale.y, color);
+        Miscellaneous.GizmosExtra.DrawWireRectangle(formationPosition, formationScale.x, formationScale.y, color);
     }
+#endif
 }

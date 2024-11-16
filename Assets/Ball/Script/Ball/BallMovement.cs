@@ -12,7 +12,6 @@ struct PredictionBall
 
 public class BallMovement : MonoBehaviour
 {
-    [SerializeField] private GameObject BallPrefab;
     [SerializeField] private Rigidbody2D rb;
 
     public static string BallTag = "Ball";
@@ -48,6 +47,11 @@ public class BallMovement : MonoBehaviour
         else{
             PredictPos.Clear();
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        GenPredictionPos(rb.velocity);
     }
 
     public void AddForce(float Force, Vector3 Direction)
@@ -102,17 +106,16 @@ public class BallMovement : MonoBehaviour
         return predictionPosition;
     }
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
-        // NullReferenceException: Object reference not set to an instance of an object
-        // BallMovement.OnDrawGizmos()(at Assets / Ball / Script / Ball / BallMovement.cs:99)
-        // UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean &)
         if (Application.isPlaying && Application.isEditor && PredictPos.Count > 0)
         {
             for (int i = 1; i <= PredictFrameCount / 5; i++)
             {
-                GizmosExtra.DrawWireDisk(PredictPos[i * 5 - 1], 0.5f, Color.green);
+                Miscellaneous.GizmosExtra.DrawWireDisk(PredictPos[i * 5 - 1], 0.5f, Color.green);
             }
         }
     }
+#endif
 }

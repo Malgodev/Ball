@@ -1,10 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEditor.SceneTemplate;
+using Unity.Netcode;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public enum ETeamHasBall
 {
@@ -22,7 +18,7 @@ public enum ETeamState
     Neutral
 }
 
-public class FormationAI : MonoBehaviour
+public class FormationAI : NetworkBehaviour
 {
     bool isHasBall = false;
     public bool IsTeamOne = false;
@@ -63,12 +59,19 @@ public class FormationAI : MonoBehaviour
 
     float delta = 1f;
 
-
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        formationController = GetComponent<FormationController>();
-        ball = GameController.Instance.ball.transform;
+        base.OnNetworkSpawn();
 
+        formationController = GetComponent<FormationController>();
+        ball = GameController.Instance.Ball.transform;
+    }
+
+    // TODO make this sync on every client
+    [ClientRpc]
+    public void InitFormationAIClientRpc(bool isTeamOne)
+    {
+        IsTeamOne = isTeamOne;
         if (!IsTeamOne)
         {
             LowerLimit = -LowerLimit;
@@ -164,7 +167,7 @@ public class FormationAI : MonoBehaviour
             target.x = Mathf.Lerp(Middle, UpperLimit - deltaX, smoothedPossessionBalance);
         }
 
-        Transform ballTransform = GameController.Instance.ball.transform;
+        Transform ballTransform = GameController.Instance.Ball.transform;
 
         target.y = ballTransform.position.y;
 
@@ -202,11 +205,13 @@ public class FormationAI : MonoBehaviour
         );
     }
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         string str = smoothedPossessionBalance.ToString();
         Vector2 location = new Vector2(55 * (IsTeamOne ? -1 : 1), 55);
 
-        GizmosExtra.DrawString(str, location, Color.green, Color.black);
+        Miscellaneous.GizmosExtra.DrawString(str, location, Color.green, Color.black);
     }
+#endif
 }

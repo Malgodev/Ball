@@ -1,12 +1,7 @@
-using Mono.Cecil.Cil;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Timeline;
+using Unity.Netcode;
 using UnityEngine;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
-using static UnityEditor.ShaderData;
 
 public enum EPlayerState
 {
@@ -16,77 +11,77 @@ public enum EPlayerState
     Pass,
     RunToBall,
     ReceiveBall,
+    Controlled,
 }
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
-    // Player need time to reach maximum speed
+    // TODO Player need time to reach maximum speed
     // and also need time to slower down
-
-    public EPlayerRole Role { get; private set; }
-    public EPlayerState PlayerState { get; private set; }
-
-    // The position of player in formation rectangle
-    public Vector2 defaultOffset { get; private set; }
-
-    // Movement
-    [SerializeField] private float moveSpeed = 10f;
-    private static float moveSpeedScale = 250f;
-    public float MoveableRadius;
-
-    public Rigidbody2D rb { get; private set; }
-
     private GameObject ball;
 
-    public float TimeToReachBall { get; private set; } = -1f;
+    [field: Header("Component")]
+    public Rigidbody2D rb { get; private set; }
 
-    UserInput userInput;
-
-    public Color textColor = Color.white;
-
+    [field: Header("Team info")]
     public bool IsTeamOne { get; private set; } = false;
 
-    private bool isClosestToBall = false;
+    [field: Header("Player info")]
+    [field: SerializeField] public EPlayerRole Role { get; private set; }
+    [field: SerializeField] public EPlayerState PlayerState { get; private set; }
+    [field: SerializeField] public Vector2 DefaultOffset { get; private set; } // The position of player in formation rectangle
+    [SerializeField] private float moveSpeed = 10f;
+    public float MoveableRadius;
+    private const float MOVE_SPEED_SCALE = 250f;
 
-    public float DangerRate { get; private set; } = 0;
-    public float DangerRadius = 10f;
-    public const float DANGER_RATE_SPEED = 3f;
+    [field: Header("Ingame player field")]
+    [field: SerializeField] public float TimeToReachBall { get; private set; } = -1f;
+    [field: SerializeField] public float DangerRate { get; private set; } = 0;
+    [SerializeField] private float DangerRadius = 10f;
 
-    const int UPDATED_FRAME_INTERVAL = 500;
-    int frameCounter = 0;
-
+    [field: Header("Player setting")]
+    private int frameCounter = 0;
+    private const int UPDATED_FRAME_INTERVAL = 500;
+    private const float DANGER_RATE_SPEED = 3f;
     public Vector2 DeltaPosition;
+    public Color textColor = Color.white;
+
 
     private Vector2 targetPosition;
+    private PlayerController controlledPlayer;
 
-    private int timeToPass = 60;
-
-    private void Awake()
+    private void Start()
     {
-        // IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
+        DeltaPosition = new Vector2(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5));
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        ball = GameController.Instance.Ball;
 
         rb = GetComponent<Rigidbody2D>();
 
         moveSpeed += UnityEngine.Random.Range(-.5f, .5f);
-
-        // formationRectangle = GameSingleton.Instance.teamController.formationRectangle;
     }
 
-    private void Start()
+    [ClientRpc]
+    public void SetPlayerInfoClientRpc(PlayerInfo playerInfo, bool IsTeamOne, Vector2 initPos)
     {
-        IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
-
-        ball = GameController.Instance.ball;
-
-        DeltaPosition = new Vector2(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5));
+        this.Role = playerInfo.Role;
+        this.DefaultOffset = playerInfo.Offset;
+        this.IsTeamOne = IsTeamOne;
+        this.name = playerInfo.PlayerName;
+        this.transform.position = initPos;
     }
 
-    public void SetDefaultOffset(Vector2 DefaultOffset)
+    [ClientRpc]
+    public void SetPlayerInfoClientRpc()
     {
-        this.defaultOffset = DefaultOffset;
+        Debug.Log(transform.parent.name);
     }
 
-    // Update is called once per frame
     void Update()
     {
         SpeedControl();
@@ -102,8 +97,6 @@ public class PlayerController : MonoBehaviour
 
     private void UpdateDangerRate()
     {
-        // List<GameObject> enemyPlayers = GameController.Instance.GetEnemyPlayer(IsTeamOne);
-
         Collider2D[] colliderNear = Physics2D.OverlapCircleAll(transform.position, DangerRadius);
 
         int playerInFront = 0;
@@ -113,14 +106,9 @@ public class PlayerController : MonoBehaviour
         {
             PlayerController playerController = collider.GetComponent<PlayerController>();
 
-
             if (collider.tag == "Player" && IsEnemyInFront(playerController))
             {
-                if (playerController.PlayerState == EPlayerState.Challenge)
-                {
-                    isGetChallenge = true;
-                }
-
+                isGetChallenge = (playerController.PlayerState == EPlayerState.Challenge);
                 playerInFront++;
             }
         }
@@ -160,11 +148,6 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (this == GameController.Instance.teamOneController.ControlledPlayer)
-        {
-            return;
-        }
-
         switch (PlayerState)
         {
             case EPlayerState.Run:
@@ -178,28 +161,22 @@ public class PlayerController : MonoBehaviour
                 ChallengeBall();
                 break;
             case EPlayerState.Shot:
-                ShotBall(GameController.Instance.ball);
+                ShotBall(GameController.Instance.Ball);
                 break;
             case EPlayerState.Pass:
-                PassBall(GameController.Instance.ball);
+                PassBall(GameController.Instance.Ball);
                 break;
             case EPlayerState.RunToBall:
                 RunToBall();
                 break;
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.gameObject.CompareTag(BallMovement.BallTag))
-        {
-            GameController.Instance.SetPlayerHasBall(this);
+            case EPlayerState.Controlled:
+                return;
         }
     }
 
     private float GetTimeToReachBall()
     {
-        BallMovement ballMovement = GameController.Instance.ball.GetComponent<BallMovement>();
+        BallMovement ballMovement = GameController.Instance.Ball.GetComponent<BallMovement>();
 
         if (ballMovement.PredictPos.Count == 0)
         {
@@ -229,21 +206,7 @@ public class PlayerController : MonoBehaviour
         return frame;
     }
 
-    #region Initialization
-    public void SetPosition(Vector2 targetPos)
-    {
-        transform.position = targetPos;
-    }
-
-    public void SetRole(EPlayerRole role)
-    {
-        this.Role = role;
-    }
-    #endregion
-
-    // Put this into other player script
     #region Movement controller
-
     /// <summary>
     /// Try to move player to that position, each time move by direction to that pos * move speed of player
     /// </summary>
@@ -272,21 +235,15 @@ public class PlayerController : MonoBehaviour
 
         transform.rotation = GetRotationByDirection(direc);
 
-        rb.AddForce(direc * moveSpeed * moveSpeedScale * Time.fixedDeltaTime);
+        rb.AddForce(direc * moveSpeed * MOVE_SPEED_SCALE * Time.fixedDeltaTime);
     }
 
     public void MoveByAxis(Vector2 movement)
     {
-
         transform.rotation = GetRotationByDirection(movement);
 
         // rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
-        rb.AddForce(movement.normalized * moveSpeed * moveSpeedScale * Time.fixedDeltaTime);
-
-        // move player to position, should change it to better movement.
-        // attack fb, chuyen len phia tren striker
-        // def fb, chan bong cua thang striker
-
+        rb.AddForce(movement.normalized * moveSpeed * MOVE_SPEED_SCALE * Time.fixedDeltaTime);
     }
 
     public Quaternion GetRotationByDirection(Vector2 direction)
@@ -312,9 +269,7 @@ public class PlayerController : MonoBehaviour
             rb.velocity = rb.velocity.normalized * moveSpeed;
         }
     }
-    #endregion
 
-    #region Ball controller
     public IEnumerator DribblingBall()
     {
         // TODO Change ball object logic, not stick to player -> ball will be kicked away and repeat
@@ -330,8 +285,6 @@ public class PlayerController : MonoBehaviour
             BallPos += transform.right * 1f;
             ball.transform.position = new Vector3(BallPos.x, BallPos.y, -1);
             ball.GetComponent<BallMovement>().StopForce();
-
-            // Debug.Log((playerHasBall == null).ToString() + " " + playerHasBall.Equals(this));
 
             yield return null;
         }
@@ -357,17 +310,12 @@ public class PlayerController : MonoBehaviour
         MoveToPosition(ball.transform.position, false);
     }
 
+    // TODO Code to check how long the key has pressed -> convert to force
     public void ShotBall(GameObject ball)
     {
-        // TODO Code to check how long the key has pressed -> convert to force
-
         GameController.Instance.SetPlayerHasBall(null);
 
-        Transform goal = GameController.Instance.GetGoal(IsTeamOne);
-
-
-        Vector2 shootingDirection = goal.position - transform.position;
-        shootingDirection.Normalize();
+        Vector2 shootingDirection = GameController.Instance.GetDirectionToGoal(IsTeamOne, this);
 
         transform.rotation = GetRotationByDirection(shootingDirection);
 
@@ -376,10 +324,10 @@ public class PlayerController : MonoBehaviour
         StopAllCoroutines();
 
         ball.GetComponent<BallMovement>().AddForce(50f, shootingDirection);
-        GameController.Instance.SetPlayerHasBall(null);
     }
 
 
+    // TODO Code to check how long the key has pressed -> convert to force
     public void PassBall(GameObject ball, GameObject targetPass = null)
     {
         if (targetPass == null)
@@ -390,14 +338,13 @@ public class PlayerController : MonoBehaviour
         Vector2 passingDirection = (targetPass.transform.position - transform.position);
         passingDirection.Normalize();
 
-        // TODO Code to check how long the key has pressed -> convert to force
+        GameController.Instance.SetPlayerHasBall(null);
 
         transform.rotation = GetRotationByDirection(passingDirection);
 
         rb.velocity = Vector2.zero;
 
         StopAllCoroutines();
-        GameController.Instance.SetPlayerHasBall(null);
         ball.GetComponent<BallMovement>().AddForce(50f, passingDirection);
     }
 
@@ -436,28 +383,60 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region Setter
+    public void SetDefaultOffset(Vector2 DefaultOffset)
+    {
+        this.DefaultOffset = DefaultOffset;
+    }
+
     public void SetPlayerTargetPosition(Vector2 target)
     {
         targetPosition = target;
     }
 
-
     public void SetPlayerState(EPlayerState playerState)
     {
         PlayerState = playerState;
     }
-    private void OnDrawGizmos()
+
+    public void SetPosition(Vector2 targetPos)
     {
-        string str = "";
-        // Player velocity
-        float vel = rb.velocity.magnitude;
-        str += PlayerState + " ";
-        str += (Mathf.Floor(vel * 100) / 100).ToString() + " ";
-        str += (Mathf.Floor(DangerRate * 100) / 100).ToString() + " ";
-        str += GetTimeToReachBall() != -1 ? Mathf.Round(GetTimeToReachBall() * 100) / 100 : " ?";
-
-        GizmosExtra.DrawString(str, transform.position, textColor, Color.black);
-
-        // GizmosExtra.DrawWireDisk(transform.position, DangerRadius, Color.red);
+        transform.position = targetPos;
     }
+
+    public void SetRole(EPlayerRole role)
+    {
+        this.Role = role;
+    }
+    #endregion
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag(BallMovement.BallTag))
+        {
+            GameController.Instance.SetPlayerHasBall(this);
+        }
+    }
+
+//#if UNITY_EDITOR
+//    private void OnDrawGizmos()
+//    {
+//        if (!Application.isPlaying)
+//        {
+//            return;
+//        }
+
+    //        string str = "";
+    //        // Player velocity
+    //        float vel = rb.velocity.magnitude;
+    //        str += PlayerState + " ";
+    //        str += (Mathf.Floor(vel * 100) / 100).ToString() + " ";
+    //        str += (Mathf.Floor(DangerRate * 100) / 100).ToString() + " ";
+    //        str += GetTimeToReachBall() != -1 ? Mathf.Round(GetTimeToReachBall() * 100) / 100 : " ?";
+
+    //        Miscellaneous.GizmosExtra.DrawString(str, transform.position, textColor, Color.black);
+
+    //        // GizmosExtra.DrawWireDisk(transform.position, DangerRadius, Color.red);
+    //    }
+    //#endif
 }
