@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class GameController : NetworkBehaviour
@@ -35,10 +36,8 @@ public class GameController : NetworkBehaviour
     public event EventHandler OnInteractAction;
     public event EventHandler OnLocalPlayerReadyChange;
 
-    // remove this
     public bool IsLocalPlayerReady { get; private set; } = false;
     private Dictionary<ulong, bool> playerReadyDict;
-
 
     public enum GameState
     {
@@ -49,9 +48,9 @@ public class GameController : NetworkBehaviour
 
     [field: SerializeField] public NetworkVariable<GameState> State { get; private set; } = new NetworkVariable<GameState>(GameState.WaitingToStart);
     public NetworkVariable<float> GamePlayingTimer { get; private set; } = new NetworkVariable<float>(0f);
-    private float MAXIMUM_PLAYING_TIME = 10f;
 
     private float waitingConnectTime = 120f;
+    private float MAXIMUM_PLAYING_TIME = 10f;
 
     private void Awake()
     {
@@ -93,15 +92,6 @@ public class GameController : NetworkBehaviour
         }
     }
 
-    // Default team one
-    // Pos -23 5 -1
-    // Rot 0 0 0
-    // Sca 55 50 1
-    // Default team two
-    // Pos -23 -5 -1
-    // Rot 0 0 180
-    // Sca 55 50 1
-
     private void SceneManager_OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
@@ -124,6 +114,7 @@ public class GameController : NetworkBehaviour
             }
 
             GeneratePlayer(teamController, clientId);
+            SetTeamColor(teamController, clientId == 0 ? Color.green : Color.red);
         }
 
         if (TeamTwoController == null)
@@ -136,6 +127,7 @@ public class GameController : NetworkBehaviour
             TeamTwoController = teamController;
 
             GeneratePlayer(teamController, 0);
+            SetTeamColor(teamController, Color.red);
         }
     }
 
@@ -173,15 +165,6 @@ public class GameController : NetworkBehaviour
         teamController.SetPlayerListClientRpc();
     }
 
-    public void ReadyToPlay()
-    {
-        if (State.Value == GameState.WaitingToStart)
-        {
-            IsLocalPlayerReady = true;
-            OnLocalPlayerReadyChange?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
     private void Update()
     {
         CurrentFPS = Mathf.Round(1.0f / Time.deltaTime);
@@ -211,27 +194,6 @@ public class GameController : NetworkBehaviour
         }
     }
 
-
-
-    public void SpawnPlayer(TeamController teamController)
-    {
-        if (teamController.IsTeamOne)
-        {
-            GeneratePlayerInfo.GetPlayerInfo(teamController);
-            SetTeamController(teamController);
-        }
-        else
-        {
-            GeneratePlayerInfo.GetPlayerInfo(teamController);
-            SetTeamController(teamController);
-        }
-    }
-
-    public void StartCountdown()
-    {
-
-    }
-
     public void SetLocalPlayerReady(bool isReady)
     {
         SetPlayerReadyServerRpc();
@@ -254,26 +216,7 @@ public class GameController : NetworkBehaviour
 
         if (isAllPlayerReady)
         {
-            Debug.Log("All player ready: Game start");
             State.Value = GameState.GamePlaying;
-        }
-        else
-        {
-            Debug.Log("Waiting for player");
-        }
-    }
-
-    public void SetTeamController(TeamController teamController)
-    {
-        if (teamController.IsTeamOne)
-        {
-            TeamOneController = teamController;
-            SetTeamColor(TeamOneController, Color.red);
-        }
-        else
-        {
-            TeamTwoController = teamController;
-            SetTeamColor(TeamTwoController, Color.green);
         }
     }
 
@@ -283,7 +226,6 @@ public class GameController : NetworkBehaviour
 
         if (player != null)
         {
-            // TODO Change this
             StartCoroutine(player.DribblingBall());
         }
         else

@@ -19,11 +19,12 @@ public class TeamController : NetworkBehaviour
 
     [field: Header("Player")]
     [field: SerializeField] public List<GameObject> PlayerList { get; private set; }
-    [field: SerializeField] public PlayerController ControlledPlayer { get; private set; }
     [field: SerializeField] public PlayerController ClosestPlayerToBall { get; private set; }
 
     [field: Header("User control")]
     [field: SerializeField] public bool IsControlledPlayer { get; private set; }
+    [field: SerializeField] public PlayerController ControlledPlayer { get; private set; }
+
     private UserInput userInput;
 
     private int updateCounter = 0;
@@ -37,29 +38,12 @@ public class TeamController : NetworkBehaviour
         userInput = GetComponent<UserInput>();
     }
 
-    private void Start()
-    {
-        // ball = GameController.Singleton.Ball;
-        // goal == get target goal;
-        formationController.IsTeamOne = IsTeamOne;
-        formationAI.IsTeamOne = IsTeamOne;
-    }
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
-        // GameController.Singleton.SpawnPlayer(this);
         ball = GameController.Instance.Ball;
-
         this.gameObject.name = "Team" + (IsTeamOne ? "One" : "Two");
-
-        // SetAllTeamPlayer();
-
-        //if (IsControlledPlayer)
-        //{
-        //    SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
-        //}
     }
 
     // Mostly use for set player state
@@ -86,6 +70,55 @@ public class TeamController : NetworkBehaviour
         DelayUpdate();
     }
 
+    private void FixedUpdate()
+    {
+        PlayerController newClosestToBall = ClosestPlayerToBall;
+
+        for (int i = 0; i < PlayerList.Count; i++)
+        {
+            PlayerController playerController = PlayerList[i].GetComponent<PlayerController>();
+
+            if (playerController.Role == EPlayerRole.Goalkeeper)
+            {
+                continue;
+            }
+
+            if (CompareClosestPlayerToBall(newClosestToBall, playerController))
+            {
+                newClosestToBall = playerController;
+            }
+        }
+
+        if (newClosestToBall != ClosestPlayerToBall)
+        {
+            newClosestToBall.textColor = Color.green;
+            if (ClosestPlayerToBall != null)
+            {
+                ClosestPlayerToBall.textColor = Color.white;
+            }
+            ClosestPlayerToBall = newClosestToBall;
+        }
+    }
+
+    private void ControlPlayer()
+    {
+        if (ControlledPlayer == null)
+        {
+            return;
+        }
+
+        switch (userInput.InputState)
+        {
+            case EPlayerState.Run:
+                ControlledPlayer.MoveByAxis(userInput.InputVector);
+                break;
+            case EPlayerState.Shot:
+                ControlledPlayer.ShotBall(ball);
+                userInput.InputState = EPlayerState.Run;
+                break;
+        }
+    }
+
     private void DelayUpdate()
     {
         // Set player logic
@@ -108,32 +141,11 @@ public class TeamController : NetworkBehaviour
 
         // Set controlled player
         SetControlledPlayer();
-
-    }
-
-    private void ControlPlayer()
-    {
-        if (ControlledPlayer == null)
-        {
-            Debug.Log("Some where is wrong");
-            return;
-        }
-
-        switch (userInput.InputState) 
-        {
-            case EPlayerState.Run:
-                ControlledPlayer.MoveByAxis(userInput.InputVector);
-                break;
-            case EPlayerState.Shot:
-                ControlledPlayer.ShotBall(ball);
-                userInput.InputState = EPlayerState.Run;
-                break;
-        }
-
     }
 
     private void SetControlledPlayer()
     {
+        // TODO Change to control to closest player to ball
         if (IsControlledPlayer)
         {
             SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
@@ -150,7 +162,6 @@ public class TeamController : NetworkBehaviour
 
         if (playerController == playerHasBall)
         {
-            // Here to, change singleton to get distance from current goal
             if (PossessionRate >= 0.9f && GameController.Instance.GetDistanceToGoal(IsTeamOne, playerController) < 10f)
             {
                 playerController.SetPlayerState(EPlayerState.Shot);
@@ -176,44 +187,6 @@ public class TeamController : NetworkBehaviour
         {
             playerController.SetPlayerState(EPlayerState.Run);
         }
-    }
-
-
-    // Set other player field
-    private void FixedUpdate()
-    {
-        PlayerController newClosestToBall = ClosestPlayerToBall;
-
-        for (int i = 0; i < PlayerList.Count; i++)
-        {
-            PlayerController playerController = PlayerList[i].GetComponent<PlayerController>();
-
-            if (playerController.Role == EPlayerRole.Goalkeeper)
-            {
-                continue;
-            }
-
-            if (CompareClosestPlayerToBall(newClosestToBall, playerController))
-            {
-                newClosestToBall = playerController;
-            }
-        }
-
-        if (newClosestToBall != ClosestPlayerToBall)
-        {
-            ClosestPlayerToBall = newClosestToBall;
-        }
-
-#if UNITY_EDITOR
-        if (newClosestToBall != ClosestPlayerToBall)
-        {
-            newClosestToBall.textColor = Color.green;
-            if (ClosestPlayerToBall != null)
-            {
-                ClosestPlayerToBall.textColor = Color.white;
-            }
-        }
-#endif
     }
 
     private bool CompareClosestPlayerToBall(PlayerController currentPlayer, PlayerController targetPlayer)
@@ -248,10 +221,8 @@ public class TeamController : NetworkBehaviour
 
         formationController.InitFormationControllerClientRpc(IsTeamOne);
         formationAI.InitFormationAIClientRpc(IsTeamOne);
-        // formationController.
     }
 
-    // FIX Cái này luôn được check xem có player nào gần bóng nhất -> set player điều khiển cái đấy
     public void SetControlledPlayer(PlayerController player)
     {
         if (ControlledPlayer != null)
@@ -273,76 +244,6 @@ public class TeamController : NetworkBehaviour
             {
                 PlayerList.Add(child.gameObject);
             }
-        }
-    }
-
-
-    [ClientRpc]
-    public void SetPlayerListClientRpc(PlayerInfo[] playerInfoList)
-    {
-        foreach (PlayerInfo playerInfo in playerInfoList)
-        {
-            SpawnPlayerByInfoServerRpc(playerInfo);
-        }
-
-        if (IsControlledPlayer)
-        {
-            SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
-        }
-    }
-
-    [ServerRpc(RequireOwnership =false)]
-    private void SpawnPlayerByInfoServerRpc(PlayerInfo playerInfo)
-    {
-        // PlayerList
-        GameObject newPlayer = Instantiate(GameController.Instance.PlayerPrefab);
-        if (IsControlledPlayer)
-        {
-            newPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkObject.OwnerClientId, true);
-        }
-        else
-        {
-            newPlayer.GetComponent<NetworkObject>().Spawn(true);
-        }
-
-        Vector2 initPos = formationController.GetWorldPositionByOffset(playerInfo.Offset);
-        newPlayer.GetComponent<PlayerController>().SetPlayerInfoClientRpc(playerInfo, IsTeamOne, initPos);
-        newPlayer.transform.parent = this.transform;
-
-        PlayerList.Add(newPlayer);
-    }
-
-
-    // Outdated
-    public void SetPlayerList(List<GameObject> targetPlayerList)
-    {
-        PlayerList = targetPlayerList;
-
-        foreach (GameObject player in PlayerList)
-        {
-            PlayerController playerController = player.GetComponent<PlayerController>();
-
-            NetworkObject networkObject = player.GetComponent<NetworkObject>();
-
-            if (networkObject != null && networkObject.IsSpawned)
-            {
-                player.transform.SetParent(this.transform);
-            }
-/*            else
-            {
-                networkObject?.Spawn();
-                player.transform.SetParent(this.transform);
-            }*/
-
-            player.name = playerController.Role.ToString() + " " + PlayerList.IndexOf(player);
-
-            Vector2 newPos = formationController.GetWorldPositionByOffset(playerController.DefaultOffset);
-            playerController.SetPosition(newPos);
-        }
-
-        if (IsControlledPlayer)
-        {
-            SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
         }
     }
     #endregion

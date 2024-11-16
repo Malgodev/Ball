@@ -272,8 +272,6 @@ public class PlayerController : NetworkBehaviour
 
     public IEnumerator DribblingBall()
     {
-        // TODO Change ball object logic, not stick to player -> ball will be kicked away and repeat
-
         PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
 
 
@@ -418,25 +416,25 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-//#if UNITY_EDITOR
-//    private void OnDrawGizmos()
-//    {
-//        if (!Application.isPlaying)
-//        {
-//            return;
-//        }
+#if UNITY_EDITOR
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
 
-    //        string str = "";
-    //        // Player velocity
-    //        float vel = rb.velocity.magnitude;
-    //        str += PlayerState + " ";
-    //        str += (Mathf.Floor(vel * 100) / 100).ToString() + " ";
-    //        str += (Mathf.Floor(DangerRate * 100) / 100).ToString() + " ";
-    //        str += GetTimeToReachBall() != -1 ? Mathf.Round(GetTimeToReachBall() * 100) / 100 : " ?";
+        string str = "";
+        // Player velocity
+        float vel = rb.velocity.magnitude;
+        str += PlayerState + " ";
+        str += (Mathf.Floor(vel * 100) / 100).ToString() + " ";
+        str += (Mathf.Floor(DangerRate * 100) / 100).ToString() + " ";
+        str += GetTimeToReachBall() != -1 ? Mathf.Round(GetTimeToReachBall() * 100) / 100 : " ?";
 
-    //        Miscellaneous.GizmosExtra.DrawString(str, transform.position, textColor, Color.black);
+        Miscellaneous.GizmosExtra.DrawString(str, transform.position, textColor, Color.black);
 
-    //        // GizmosExtra.DrawWireDisk(transform.position, DangerRadius, Color.red);
-    //    }
-    //#endif
+        // GizmosExtra.DrawWireDisk(transform.position, DangerRadius, Color.red);
+    }
+#endif
 }
