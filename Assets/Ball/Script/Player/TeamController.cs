@@ -35,7 +35,6 @@ public class TeamController : NetworkBehaviour
         PlayerList = new List<GameObject>();
 
         userInput = GetComponent<UserInput>();
-
     }
 
     private void Start()
@@ -67,23 +66,16 @@ public class TeamController : NetworkBehaviour
     // From that, player will automaticly move by that state
     private void Update()
     {
-        if (IsOwner)
-        {
-            if (Input.GetAxisRaw("Horizontal") != 0)
-            {
-                this.gameObject.name = "Bruh";
-            }
-            else
-            {
-                this.gameObject.name = "Not bruh";
-            }
-        }
-
         if (GameController.Instance.State.Value != GameController.GameState.GamePlaying)
         {
             return;
         }
-        
+
+        if (IsControlledPlayer)
+        {
+            ControlPlayer();
+        }
+
         updateCounter++;
         if (updateCounter >= 5)
         {
@@ -91,6 +83,12 @@ public class TeamController : NetworkBehaviour
             return;
         }
 
+        DelayUpdate();
+    }
+
+    private void DelayUpdate()
+    {
+        // Set player logic
         PlayerController playerHasBall = GameController.Instance.PlayerHasBall;
 
         foreach (GameObject player in PlayerList)
@@ -106,6 +104,39 @@ public class TeamController : NetworkBehaviour
 
             Vector2 defaultTargetPos = formationController.GetWorldPositionByOffset(playerController.DefaultOffset);
             GetTargetState(playerController, defaultTargetPos, playerHasBall);
+        }
+
+        // Set controlled player
+        SetControlledPlayer();
+
+    }
+
+    private void ControlPlayer()
+    {
+        if (ControlledPlayer == null)
+        {
+            Debug.Log("Some where is wrong");
+            return;
+        }
+
+        switch (userInput.InputState) 
+        {
+            case EPlayerState.Run:
+                ControlledPlayer.MoveByAxis(userInput.InputVector);
+                break;
+            case EPlayerState.Shot:
+                ControlledPlayer.ShotBall(ball);
+                userInput.InputState = EPlayerState.Run;
+                break;
+        }
+
+    }
+
+    private void SetControlledPlayer()
+    {
+        if (IsControlledPlayer)
+        {
+            SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
         }
     }
 
@@ -189,7 +220,7 @@ public class TeamController : NetworkBehaviour
     {
         if (currentPlayer == null)
         {
-           return true;
+            return true;
         }
 
         if (currentPlayer.TimeToReachBall == -1)
@@ -206,7 +237,8 @@ public class TeamController : NetworkBehaviour
     }
 
     #region Setter
-    public void SetTeamInfo(bool isTeamOne, bool isControlled)
+    [ClientRpc]
+    public void SetTeamInfoClientRpc(bool isTeamOne, bool isControlled)
     {
         IsTeamOne = isTeamOne;
 
@@ -214,13 +246,12 @@ public class TeamController : NetworkBehaviour
 
         IsControlledPlayer = isControlled;
 
-        formationController.InitFormationController(IsTeamOne);
-        formationAI.InitFormationAI(IsTeamOne);
-
+        formationController.InitFormationControllerClientRpc(IsTeamOne);
+        formationAI.InitFormationAIClientRpc(IsTeamOne);
         // formationController.
     }
 
-
+    // FIX Cái này luôn được check xem có player nào gần bóng nhất -> set player điều khiển cái đấy
     public void SetControlledPlayer(PlayerController player)
     {
         if (ControlledPlayer != null)
@@ -230,54 +261,57 @@ public class TeamController : NetworkBehaviour
 
         ControlledPlayer = player;
 
-        userInput.SetControlledPlayer(player);
         ControlledPlayer.SetPlayerState(EPlayerState.Controlled);
     }
 
-    public void SetAllTeamPlayer()
+    [ClientRpc]
+    public void SetPlayerListClientRpc()
     {
-        PlayerList = new List<GameObject>();
-
-        for (int i = 0; i < transform.childCount; i++)
+        foreach (Transform child in transform)
         {
-            Transform childTransform = transform.GetChild(i);
-
-            GameObject childObject = childTransform.gameObject;
-
-            if (childObject.tag == PLAYER_TAG)
+            if (child.CompareTag(PLAYER_TAG))
             {
-                PlayerList.Add(childObject);
+                PlayerList.Add(child.gameObject);
             }
         }
     }
 
-    public void SetIsControlledPlayer(bool isControlledPlayer)
+
+    [ClientRpc]
+    public void SetPlayerListClientRpc(PlayerInfo[] playerInfoList)
     {
-        IsControlledPlayer = isControlledPlayer;
-        // SetControlledPlayer(null);
+        foreach (PlayerInfo playerInfo in playerInfoList)
+        {
+            SpawnPlayerByInfoServerRpc(playerInfo);
+        }
+
+        if (IsControlledPlayer)
+        {
+            SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
+        }
     }
 
-    public void SetFormationRec(bool isTeamOne)
+    [ServerRpc(RequireOwnership =false)]
+    private void SpawnPlayerByInfoServerRpc(PlayerInfo playerInfo)
     {
-        Vector2 pos;
-        Quaternion rot;
-        Vector2 scale;
-
-        if (isTeamOne)
+        // PlayerList
+        GameObject newPlayer = Instantiate(GameController.Instance.PlayerPrefab);
+        if (IsControlledPlayer)
         {
-            pos = new Vector2(-23, 0);
-            rot = Quaternion.Euler(0, 0, 0);
-            scale = new Vector2(55, 50);
+            newPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(NetworkObject.OwnerClientId, true);
         }
         else
         {
-            pos = new Vector2(23, 0);
-            rot = Quaternion.Euler(0, 0, 180);
-            scale = new Vector2(55, 50);
+            newPlayer.GetComponent<NetworkObject>().Spawn(true);
         }
 
-        formationController.SetFormationRectTransform(pos, rot, scale);
+        Vector2 initPos = formationController.GetWorldPositionByOffset(playerInfo.Offset);
+        newPlayer.GetComponent<PlayerController>().SetPlayerInfoClientRpc(playerInfo, IsTeamOne, initPos);
+        newPlayer.transform.parent = this.transform;
+
+        PlayerList.Add(newPlayer);
     }
+
 
     // Outdated
     public void SetPlayerList(List<GameObject> targetPlayerList)

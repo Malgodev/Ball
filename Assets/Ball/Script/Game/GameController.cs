@@ -114,16 +114,16 @@ public class GameController : NetworkBehaviour
 
             if (clientId == 0)
             {
-                teamController.SetTeamInfo(true, false);
-                // teamController.SetTeamInfo(true, true);
+                teamController.SetTeamInfoClientRpc(true, true);
                 TeamOneController = teamController;
             }
             else
             {
-                Debug.Log("spawn new stuff");
-                teamController.SetTeamInfo(false, false);
+                teamController.SetTeamInfoClientRpc(false, true);
                 TeamTwoController = teamController;
             }
+
+            GeneratePlayer(teamController, clientId);
         }
 
         if (TeamTwoController == null)
@@ -132,19 +132,45 @@ public class GameController : NetworkBehaviour
             teamGameObject.GetComponent<NetworkObject>().Spawn(true);
             TeamController teamController = teamGameObject.GetComponent<TeamController>();
 
-            teamController.SetTeamInfo(false, false);
-            //teamController.SetIsTeamOne(false);
-            //teamController.SetIsControlledPlayer(false);
+            teamController.SetTeamInfoClientRpc(false, false);
             TeamTwoController = teamController;
+
+            GeneratePlayer(teamController, 0);
         }
     }
 
-    private void Start()
+    private void GeneratePlayer(TeamController teamController, ulong clientId)
     {
-        //SetTeamColor(teamOneController, Color.red);
-        //SetTeamColor(teamTwoController, Color.green);
+        PlayerInfo[] playerInfos = GeneratePlayerInfo.GetPlayerInfo(teamController);
 
+        if (playerInfos == null)
+        {
+            return;
+        }
+ 
+        List<GameObject> playerList = new List<GameObject>();
 
+        foreach (PlayerInfo playerInfo in playerInfos)
+        {
+            GameObject newPlayer = Instantiate(GameController.Instance.PlayerPrefab);
+
+            if (teamController.IsControlledPlayer)
+            {
+                newPlayer.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+            }
+            else
+            {
+                newPlayer.GetComponent<NetworkObject>().Spawn(true);
+            }
+
+            Vector2 initPos = teamController.formationController.
+                GetWorldPositionByOffset(playerInfo.Offset);
+
+            newPlayer.GetComponent<PlayerController>().SetPlayerInfoClientRpc(playerInfo, teamController.IsTeamOne, initPos);
+            newPlayer.transform.parent = teamController.transform;
+        }
+
+        teamController.SetPlayerListClientRpc();
     }
 
     public void ReadyToPlay()
@@ -191,12 +217,12 @@ public class GameController : NetworkBehaviour
     {
         if (teamController.IsTeamOne)
         {
-            GeneratePlayer.GeneratePlayerByTeam(teamController);
+            GeneratePlayerInfo.GetPlayerInfo(teamController);
             SetTeamController(teamController);
         }
         else
         {
-            GeneratePlayer.GeneratePlayerByTeam(teamController);
+            GeneratePlayerInfo.GetPlayerInfo(teamController);
             SetTeamController(teamController);
         }
     }

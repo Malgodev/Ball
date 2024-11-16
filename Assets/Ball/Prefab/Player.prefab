@@ -98,8 +98,8 @@ GameObject:
   - component: {fileID: 9023163209358596572}
   - component: {fileID: -4037726929420109991}
   - component: {fileID: 5959509534299132994}
-  - component: {fileID: 2682240916989274905}
-  - component: {fileID: 78619153957749384}
+  - component: {fileID: -7162177996506941680}
+  - component: {fileID: 9040712605827998096}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -211,14 +211,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Role>k__BackingField: 0
   <PlayerState>k__BackingField: 0
-  <defaultOffset>k__BackingField: {x: 0, y: 0}
+  <DefaultOffset>k__BackingField: {x: 0, y: 0}
   moveSpeed: 10
   MoveableRadius: 0
   <TimeToReachBall>k__BackingField: -1
   <DangerRate>k__BackingField: 0
   DangerRadius: 10
-  textColor: {r: 1, g: 1, b: 1, a: 1}
   DeltaPosition: {x: 0, y: 0}
+  textColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!50 &-4037726929420109991
 Rigidbody2D:
   serializedVersion: 4
@@ -291,7 +291,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.8, y: 0.8}
   m_EdgeRadius: 0
---- !u!114 &2682240916989274905
+--- !u!114 &-7162177996506941680
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -300,7 +300,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5386916932437810864}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: 9380a2c4ca143a24c918736f72b6063b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   UseUnreliableDeltas: 0
@@ -322,7 +322,7 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &78619153957749384
+--- !u!114 &9040712605827998096
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

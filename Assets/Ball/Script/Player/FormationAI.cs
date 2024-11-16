@@ -68,7 +68,8 @@ public class FormationAI : NetworkBehaviour
     }
 
     // TODO make this sync on every client
-    public void InitFormationAI(bool isTeamOne)
+    [ClientRpc]
+    public void InitFormationAIClientRpc(bool isTeamOne)
     {
         IsTeamOne = isTeamOne;
         if (!IsTeamOne)
@@ -82,8 +83,6 @@ public class FormationAI : NetworkBehaviour
 
     private void Update()
     {
-        return;
-
         if (frameCounter++ >= UPDATED_FRAME_INTERVAL)
         {
             UpdatePossessionBalance();
@@ -94,8 +93,6 @@ public class FormationAI : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        return;
-
         formationController.SetFormationPosition(ConvertPossessionToPosition(smoothedPossessionBalance));
         formationController.SetFormationScale(ConvertStateToScale(teamState));
 

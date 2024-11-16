@@ -17,7 +17,8 @@ public class FormationController : NetworkBehaviour
     }
 
     // TODO make this sync on every client
-    public void InitFormationController(bool isTeamOne)
+    [ClientRpc]
+    public void InitFormationControllerClientRpc(bool isTeamOne)
     {
         IsTeamOne = isTeamOne;
 

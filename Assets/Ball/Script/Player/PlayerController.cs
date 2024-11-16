@@ -50,30 +50,36 @@ public class PlayerController : NetworkBehaviour
     private Vector2 targetPosition;
     private PlayerController controlledPlayer;
 
-    private void Awake()
-    {
-        IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
-
-        rb = GetComponent<Rigidbody2D>();
-
-        moveSpeed += UnityEngine.Random.Range(-.5f, .5f);
-    }
-
     private void Start()
     {
         DeltaPosition = new Vector2(UnityEngine.Random.Range(-5, 5), UnityEngine.Random.Range(-5, 5));
-
-        // it is what it is
-        DefaultOffset = transform.parent.GetComponent<TeamController>().
-            formationController.GetOffsetByWorldPosition(this.transform.position);
     }
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
-        IsTeamOne = transform.parent.GetComponent<TeamController>().IsTeamOne;
         ball = GameController.Instance.Ball;
+
+        rb = GetComponent<Rigidbody2D>();
+
+        moveSpeed += UnityEngine.Random.Range(-.5f, .5f);
+    }
+
+    [ClientRpc]
+    public void SetPlayerInfoClientRpc(PlayerInfo playerInfo, bool IsTeamOne, Vector2 initPos)
+    {
+        this.Role = playerInfo.Role;
+        this.DefaultOffset = playerInfo.Offset;
+        this.IsTeamOne = IsTeamOne;
+        this.name = playerInfo.PlayerName;
+        this.transform.position = initPos;
+    }
+
+    [ClientRpc]
+    public void SetPlayerInfoClientRpc()
+    {
+        Debug.Log(transform.parent.name);
     }
 
     void Update()

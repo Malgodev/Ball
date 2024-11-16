@@ -1,33 +1,36 @@
+using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class GeneratePlayer : MonoBehaviour
+public class GeneratePlayerInfo : MonoBehaviour
 {
     // [SerializeField] private static GameObject playerPrefab;
 
     // Generate player by TeamController
     // @param the team that want to generate
-    public static void GeneratePlayerByTeam(TeamController teamController)
+    public static PlayerInfo[] GetPlayerInfo(TeamController teamController)
     {
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            Debug.LogWarning("GeneratePlayerByTeam can only be called on the server.");
+            return null;
+        }
+
         EFormation formation = teamController.formation;
         switch (formation)
         {
             case EFormation.Formation_3_3_2:
-                teamController.SetPlayerList(CreateFormation(Formation.Formation_3_3_2));
-                break;
-
+                return CreateFormation(Formation.Formation_3_3_2).ToArray();
             default:
                 Debug.Log("Formation invalid");
-                break;
+                return null;
         }
     }
 
-    static List<GameObject> CreateFormation(List<EPlayerRole> playerRole)
+    static List<PlayerInfo> CreateFormation(List<EPlayerRole> playerRole)
     {
-        List<GameObject> playerList = new List<GameObject>();
-
-        // TODO Rewrite algothrim, maybe factory design pattern
+        List<PlayerInfo> playerList = new List<PlayerInfo>();
 
         int numberOfFrontline = 0;
         int numberOfMidfield = 0;
@@ -67,7 +70,6 @@ public class GeneratePlayer : MonoBehaviour
         int delta = 0;
         EPlayerRole previosRole = EPlayerRole.Goalkeeper;
 
-
         foreach (EPlayerRole role in playerRole)
         {
             if (previosRole != role)
@@ -86,23 +88,23 @@ public class GeneratePlayer : MonoBehaviour
                 // Set the player position more dynamic
                 // E.g: Defender will strict together more than midfielder
                 case EPlayerRole.Goalkeeper:
-                    playerList.Add(CreatePlayer(role, new Vector2(0, 0), 1, 0));
+                    playerList.Add(CreatePlayerInfo(role, new Vector2(0, 0), 1, 0));
                     break;
 
                 case EPlayerRole.Fullback:
-                    playerList.Add(CreatePlayer(role, new Vector2(25, 0), numberOfDefender, delta));
+                    playerList.Add(CreatePlayerInfo(role, new Vector2(25, 0), numberOfDefender, delta));
                     break;
 
                 case EPlayerRole.Midfielder:
-                    playerList.Add(CreatePlayer(role, new Vector2(50, 0), numberOfMidfield, delta));
+                    playerList.Add(CreatePlayerInfo(role, new Vector2(50, 0), numberOfMidfield, delta));
                     break;
 
                 case EPlayerRole.Striker:
-                    playerList.Add(CreatePlayer(role, new Vector2(80, 0), numberOfFrontline, delta));
+                    playerList.Add(CreatePlayerInfo(role, new Vector2(80, 0), numberOfFrontline, delta));
                     break;
 
                 case EPlayerRole.Winger:
-                    playerList.Add(CreatePlayer(role, new Vector2(70, 0), numberOfFrontline, delta));
+                    playerList.Add(CreatePlayerInfo(role, new Vector2(70, 0), numberOfFrontline, delta));
                     break;
             }
         }
@@ -111,18 +113,28 @@ public class GeneratePlayer : MonoBehaviour
         
     }
 
-    static GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
+    static PlayerInfo CreatePlayerInfo(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
     {
-        GameObject newPlayer = Instantiate(GameController.Instance.PlayerPrefab);
-        PlayerController playerController = newPlayer.GetComponent<PlayerController>();
-        playerController.SetRole(role);
-
         offset.y = (delta + 1) * (100 / (numberOfRolePlayer + 1));
-        playerController.SetDefaultOffset(offset);
+        string name = role + " " + (delta + 1);
 
-        NetworkObject networkObject = newPlayer.GetComponent<NetworkObject>();
-        networkObject.Spawn();
-
-        return newPlayer;
+        return new PlayerInfo() { PlayerName = name, Role = role, Offset = offset};
     }
+
+    //static GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
+    //{
+    //    GameObject newPlayer = Instantiate(GameController.Instance.PlayerPrefab);
+    //    PlayerController playerController = newPlayer.GetComponent<PlayerController>();
+    //    playerController.SetRole(role);
+
+    //    offset.y = (delta + 1) * (100 / (numberOfRolePlayer + 1));
+    //    playerController.SetDefaultOffset(offset);
+
+    //    NetworkObject networkObject = newPlayer.GetComponent<NetworkObject>();
+    //    networkObject.Spawn();
+
+    //    Debug.Log($"The ClientId for this NetworkObject is: {networkObject.OwnerClientId}");
+
+    //    return newPlayer;
+    //}
 }
