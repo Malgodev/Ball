@@ -116,6 +116,10 @@ public class TeamController : NetworkBehaviour
                 ControlledPlayer.ShotBall(ball);
                 userInput.InputState = EPlayerState.Run;
                 break;
+            case EPlayerState.Pass:
+                ControlledPlayer.PassBall(ball);
+                userInput.InputState = EPlayerState.Run;
+                break;
         }
     }
 
@@ -221,6 +225,7 @@ public class TeamController : NetworkBehaviour
 
         formationController.InitFormationControllerClientRpc(IsTeamOne);
         formationAI.InitFormationAIClientRpc(IsTeamOne);
+        userInput.SetUserInput();
     }
 
     public void SetControlledPlayer(PlayerController player)

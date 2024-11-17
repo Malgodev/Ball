@@ -120,21 +120,4 @@ public class GeneratePlayerInfo : MonoBehaviour
 
         return new PlayerInfo() { PlayerName = name, Role = role, Offset = offset};
     }
-
-    //static GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
-    //{
-    //    GameObject newPlayer = Instantiate(GameController.Instance.PlayerPrefab);
-    //    PlayerController playerController = newPlayer.GetComponent<PlayerController>();
-    //    playerController.SetRole(role);
-
-    //    offset.y = (delta + 1) * (100 / (numberOfRolePlayer + 1));
-    //    playerController.SetDefaultOffset(offset);
-
-    //    NetworkObject networkObject = newPlayer.GetComponent<NetworkObject>();
-    //    networkObject.Spawn();
-
-    //    Debug.Log($"The ClientId for this NetworkObject is: {networkObject.OwnerClientId}");
-
-    //    return newPlayer;
-    //}
 }

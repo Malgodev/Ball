@@ -50,7 +50,7 @@ public class GameController : NetworkBehaviour
     public NetworkVariable<float> GamePlayingTimer { get; private set; } = new NetworkVariable<float>(0f);
 
     private float waitingConnectTime = 120f;
-    private float MAXIMUM_PLAYING_TIME = 10f;
+    private float MAXIMUM_PLAYING_TIME = 60f;
 
     private void Awake()
     {
