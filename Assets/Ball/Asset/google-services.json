@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "797389319070",
+    "firebase_url": "https://ball-2a706-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "ball-2a706",
+    "storage_bucket": "ball-2a706.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:797389319070:android:ab1e08b352581be183c48f",
+        "android_client_info": {
+          "package_name": "com.zerox.ball"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDy7xGGrNRFP3mwphuSmlYc19IgwM5R3lM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
