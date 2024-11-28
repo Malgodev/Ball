@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class BallGameMultiplayer : NetworkBehaviour
 {
-    private const int MAX_PLAYER_AMOUNT = 2;
+    public static int MAX_PLAYER_AMOUNT = 2;
 
     public static BallGameMultiplayer Instance { get; private set; }
 
