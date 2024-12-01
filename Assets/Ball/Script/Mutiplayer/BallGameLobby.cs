@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
@@ -23,8 +24,8 @@ public class BallGameLobby : MonoBehaviour
             Instance = this;
         }
 
-
         DontDestroyOnLoad(gameObject);
+        InitUnityAuthentication();
     }
 
 
@@ -50,14 +51,31 @@ public class BallGameLobby : MonoBehaviour
             {
                 IsPrivate = isPrivate
             });
+
+            BallGameMultiplayer.Instance.StartHost();
+            // SceneLoader.LoadNetwork(SceneLoader.Scene)
+
+            LobbyController.Instance.SetState(LobbyController.EMainMenuStateTmp.Lobby);
         }
         catch (LobbyServiceException e)
         {
             Debug.LogError(e); 
         }
+    }
+
+    public async void QuickJoin()
+    {
+        try
         {
+            joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync();
 
+            BallGameMultiplayer.Instance.StartClient();
+
+            LobbyController.Instance.SetState(LobbyController.EMainMenuStateTmp.Lobby);
         }
-
+        catch (LobbyServiceException e)
+        {
+            Debug.LogError(e);
+        }
     }
 }

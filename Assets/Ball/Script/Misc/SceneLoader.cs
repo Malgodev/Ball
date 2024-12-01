@@ -8,6 +8,7 @@ public static class SceneLoader
 {
     public enum Scene
     {
+        MainMenuScene,
         LobbyScene,
         GameScene,
     }

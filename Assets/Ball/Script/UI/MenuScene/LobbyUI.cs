@@ -28,27 +28,27 @@ public class LobbyUI : NetworkBehaviour
         returnBtn.onClick.AddListener(() =>
         {
             NetworkManager.Singleton.Shutdown();
-            MainMenuController.Instance.SetState(MainMenuController.EMainMenuState.Home);
+            LobbyController.Instance.SetState(LobbyController.EMainMenuStateTmp.Home);
         });
 
         readyBtn.onClick.AddListener(() =>
         {
-            MainMenuController.Instance.SetLocalPlayerReady();
+            LobbyController.Instance.SetLocalPlayerReady();
         });
     }
 
     private void Start()
     {
-        MainMenuController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
-        MainMenuController.Instance.OnReadyChanged += MainMenyController_OnReadyChanged;
+        LobbyController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
+        LobbyController.Instance.OnReadyChanged += MainMenyController_OnReadyChanged;
         BallGameMultiplayer.Instance.OnUserDataChanged += BallGameMultiplayer_OnUserDataChanged;
         BallGameMultiplayer.Instance.OnUserDataChanged += MainMenyController_OnReadyChanged;
     }
 
     private void MainMenyController_OnReadyChanged(object sender, System.EventArgs e)
     {
-        bool isPlayerOneReady = MainMenuController.Instance.IsPlayerReady(0);
-        bool isPlayerTwoReady = MainMenuController.Instance.IsPlayerReady(1);
+        bool isPlayerOneReady = LobbyController.Instance.IsPlayerReady(0);
+        bool isPlayerTwoReady = LobbyController.Instance.IsPlayerReady(1);
 
         playerOneIsReadyTxt.text = isPlayerOneReady ? "Ready" : "Not ready";
         playerTwoIsReadyTxt.text = isPlayerTwoReady ? "Ready" : "Not ready";
@@ -79,7 +79,7 @@ public class LobbyUI : NetworkBehaviour
     private void MainMenuController_OnMenuStateChanged(object sender, System.EventArgs e)
     {
         // ? thừa
-        if (MainMenuController.Instance.State == MainMenuController.EMainMenuState.Lobby)
+        if (LobbyController.Instance.State == LobbyController.EMainMenuStateTmp.Lobby)
         {
             Show();
         }

@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class MainMenuController : NetworkBehaviour
+public class LobbyController : NetworkBehaviour
 {
-    public static MainMenuController Instance { get; private set; }
+    public static LobbyController Instance { get; private set; }
 
-    public enum EMainMenuState
+    public enum EMainMenuStateTmp
     {
         Home,
         Setting,
         Lobby,
     }
 
-    public EMainMenuState State { get; private set; } = EMainMenuState.Home;
+    public EMainMenuStateTmp State { get; private set; } = EMainMenuStateTmp.Home;
 
     public event EventHandler OnMenuStateChanged;
     public event EventHandler OnReadyChanged;
@@ -91,17 +91,17 @@ public class MainMenuController : NetworkBehaviour
         OnReadyChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public void SetState(EMainMenuState newState)
+    public void SetState(EMainMenuStateTmp newState)
     {
         State = newState;
         OnMenuStateChanged?.Invoke(this, EventArgs.Empty);
 
         switch (newState)
         {
-            case EMainMenuState.Home:
+            case EMainMenuStateTmp.Home:
                 homePanel.SetActive(true);
                 break;
-            case EMainMenuState.Lobby:
+            case EMainMenuStateTmp.Lobby:
                 lobbyPanel.SetActive(true);
                 break;
         }
