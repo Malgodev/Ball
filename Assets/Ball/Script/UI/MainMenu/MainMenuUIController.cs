@@ -54,11 +54,13 @@ public class MainMenuUIController : MonoBehaviour
                 homePanel.Show();
                 break;
             case EMainMenuState.Setting:
-                Debug.LogWarning("Not set Setting panel yet");
+                settingPanel.Show();
                 break;
             case EMainMenuState.CreateLobby:
+                createLobbyPanel.Show();
                 break;
             case EMainMenuState.JoinLobby:
+                joinLobbyPanel.Show();  
                 break;
             case EMainMenuState.Ranking:
                 break;
@@ -69,17 +71,21 @@ public class MainMenuUIController : MonoBehaviour
         curState = newState;
     }
 
-    public void ExitState()
+    private void ExitState()
     {
         switch (curState)
         {
             case EMainMenuState.Home:
+                homePanel.Hide();
                 break;
             case EMainMenuState.Setting:
+                settingPanel.Hide();
                 break;
             case EMainMenuState.CreateLobby:
+                createLobbyPanel.Hide();    
                 break;
             case EMainMenuState.JoinLobby:
+                joinLobbyPanel.Hide();
                 break;
             case EMainMenuState.Ranking:
                 break;

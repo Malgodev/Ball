@@ -1,18 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using static MainMenuUIController;
 
 public class JoinLobbyPanel : BaseUIPanel
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private Button returnBtn;
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        returnBtn.onClick.AddListener(() =>
+        {
+            MainMenuUIController.Instance.SetState(EMainMenuState.Home);
+        });
     }
 }
