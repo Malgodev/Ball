@@ -3,21 +3,16 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class BaseUIPanel : NetworkBehaviour
+public class BaseUIPanel : MonoBehaviour
 {
     [SerializeField] private GameObject panel;
 
-    private void Start()
-    {
-        
-    }
-
-    private void Show()
+    public void Show()
     {
         panel.SetActive(true);
     }
 
-    private void Hide()
+    public void Hide()
     {
         panel.SetActive(false);
     }

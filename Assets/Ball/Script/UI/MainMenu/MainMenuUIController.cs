@@ -19,13 +19,17 @@ public class MainMenuUIController : MonoBehaviour
         Login,
     }
 
-    [field: Header("UI Components")]
-    [SerializeField] private Button createLobbyBtn;
-    [SerializeField] private Button joinLobbyBtn;
-    [SerializeField] private Button settingBtn;
-    [SerializeField] private Button exitGameBtn;
-
     [SerializeField] private EMainMenuState curState;
+
+    [field: Header("Panel")]
+    [SerializeField] private BaseUIPanel homePanel;
+    [SerializeField] private BaseUIPanel settingPanel;
+    [SerializeField] private BaseUIPanel createLobbyPanel;
+    [SerializeField] private BaseUIPanel joinLobbyPanel;
+    [SerializeField] private BaseUIPanel rankingPanel;
+    [SerializeField] private BaseUIPanel loginPanel;
+
+
 
     private void Awake()
     {
@@ -39,12 +43,33 @@ public class MainMenuUIController : MonoBehaviour
         }
     }
 
-    private void SetState(EMainMenuState newState)
+    public void SetState(EMainMenuState newState)
     {
 
+        ExitState();
+
+        switch (newState)
+        {
+            case EMainMenuState.Home:
+                homePanel.Show();
+                break;
+            case EMainMenuState.Setting:
+                Debug.LogWarning("Not set Setting panel yet");
+                break;
+            case EMainMenuState.CreateLobby:
+                break;
+            case EMainMenuState.JoinLobby:
+                break;
+            case EMainMenuState.Ranking:
+                break;
+            case EMainMenuState.Login:
+                break;
+        }
+
+        curState = newState;
     }
 
-    private void ExitState()
+    public void ExitState()
     {
         switch (curState)
         {
