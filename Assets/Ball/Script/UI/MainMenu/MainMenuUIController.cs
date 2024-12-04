@@ -63,6 +63,7 @@ public class MainMenuUIController : MonoBehaviour
                 joinLobbyPanel.Show();  
                 break;
             case EMainMenuState.Ranking:
+                rankingPanel.Show();
                 break;
             case EMainMenuState.Login:
                 break;
@@ -88,6 +89,7 @@ public class MainMenuUIController : MonoBehaviour
                 joinLobbyPanel.Hide();
                 break;
             case EMainMenuState.Ranking:
+                rankingPanel.Hide();
                 break;
             case EMainMenuState.Login:
                 break;
