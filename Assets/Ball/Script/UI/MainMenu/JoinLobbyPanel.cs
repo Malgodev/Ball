@@ -18,10 +18,10 @@ public class JoinLobbyPanel : BaseUIPanel
             MainMenuUIController.Instance.SetState(EMainMenuState.Home);
         });
 
-        ListLobbies();
+        // ListLobbies();
     }
 
-    private async void ListLobbies()
+/*    private async void ListLobbies()
     {
         try
         {
@@ -39,5 +39,5 @@ public class JoinLobbyPanel : BaseUIPanel
         {
             Debug.LogException(ex);
         }
-    }
+    }*/
 }
