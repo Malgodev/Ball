@@ -9,7 +9,14 @@ using static MainMenuUIController;
 
 public class JoinLobbyPanel : BaseUIPanel
 {
+    [field: Header("??")]
+    [SerializeField] private Transform lobbiesHolder;
+
+    [field: Header("UI Component")]
     [SerializeField] private Button returnBtn;
+
+    [field: Header("Prefab")]
+    [SerializeField] private GameObject lobbyInfoPrefab;
 
     private void Start()
     {
@@ -18,26 +25,30 @@ public class JoinLobbyPanel : BaseUIPanel
             MainMenuUIController.Instance.SetState(EMainMenuState.Home);
         });
 
-        // ListLobbies();
+        ListLobbies();
     }
 
-/*    private async void ListLobbies()
+    private async void ListLobbies()
     {
         try
         {
             QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
 
-            Debug.Log($"Lobbies found: {queryResponse.Results.Count}");
-
-
             foreach (Lobby lobby in queryResponse.Results)
             {
-                Debug.Log($"Lobby {lobby.Name} Max players {lobby.MaxPlayers}");
+
+            }
+
+            for (int i = 0; i < 30; i++)
+            {
+                GameObject lobbyInfo = Instantiate(lobbyInfoPrefab);
+                lobbyInfo.transform.SetParent(lobbiesHolder, false);
+                lobbyInfo.GetComponent<LobbyInfoController>().SetInfo(i.ToString(), i.ToString(), i);
             }
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
         }
-    }*/
+    }
 }
