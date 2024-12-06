@@ -39,10 +39,10 @@ public class LobbyUI : NetworkBehaviour
 
     private void Start()
     {
-        LobbyController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
+/*        LobbyController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
         LobbyController.Instance.OnReadyChanged += MainMenyController_OnReadyChanged;
         BallGameMultiplayer.Instance.OnUserDataChanged += BallGameMultiplayer_OnUserDataChanged;
-        BallGameMultiplayer.Instance.OnUserDataChanged += MainMenyController_OnReadyChanged;
+        BallGameMultiplayer.Instance.OnUserDataChanged += MainMenyController_OnReadyChanged;*/
     }
 
     private void MainMenyController_OnReadyChanged(object sender, System.EventArgs e)

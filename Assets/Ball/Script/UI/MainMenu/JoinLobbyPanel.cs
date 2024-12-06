@@ -36,15 +36,15 @@ public class JoinLobbyPanel : BaseUIPanel
 
             foreach (Lobby lobby in queryResponse.Results)
             {
-
+                Debug.Log(lobby.Name + " " + lobby.MaxPlayers);
             }
 
-            for (int i = 0; i < 30; i++)
+/*            for (int i = 0; i < 30; i++)
             {
                 GameObject lobbyInfo = Instantiate(lobbyInfoPrefab);
                 lobbyInfo.transform.SetParent(lobbiesHolder, false);
                 lobbyInfo.GetComponent<LobbyInfoController>().SetInfo(i.ToString(), i.ToString(), i);
-            }
+            }*/
         }
         catch (Exception ex)
         {
