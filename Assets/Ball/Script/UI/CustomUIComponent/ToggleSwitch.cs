@@ -124,7 +124,6 @@ namespace Malgo.UI
 
                     float lerpFactor = slideEase.Evaluate(time / animationDuration);
                     _slider.value = sliderValue = Mathf.Lerp(startValue, endValue, lerpFactor);
-                    Debug.Log(_slider.value);
                     yield return null;
                 }
             }
