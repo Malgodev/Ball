@@ -21,8 +21,10 @@ public class HomePanel : BaseUIPanel
         createLobbyBtn.onClick.AddListener(() =>
         {
             // Testing
+            
+            SceneLoader.Load(SceneLoader.Scene.LobbyScene);
 
-            CreateLobby();
+            // CreateLobby();
 
             // MainMenuUIController.Instance.SetState(EMainMenuState.CreateLobby);
         });

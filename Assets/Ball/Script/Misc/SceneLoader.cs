@@ -19,7 +19,7 @@ public static class SceneLoader
     {
         SceneLoader.targetScene = targetScene;
 
-        // SceneManager.LoadScene(Scene.)
+        SceneManager.LoadScene(targetScene.ToString());
 
     }
 

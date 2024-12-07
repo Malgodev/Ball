@@ -57,7 +57,7 @@ public class MainMenuUIController : MonoBehaviour
                 settingPanel.Show();
                 break;
             case EMainMenuState.CreateLobby:
-                createLobbyPanel.Show();
+                // createLobbyPanel.Show();
                 break;
             case EMainMenuState.JoinLobby:
                 joinLobbyPanel.Show();  
