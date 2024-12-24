@@ -9,11 +9,9 @@ public class LobbyInfoController : MonoBehaviour
     [SerializeField] private TMP_Text playerNameTxt;
     [SerializeField] private TMP_Text eloTxt;
 
-
-    public void SetInfo(string roomName, string playerName, int elo)
+    public void SetInfo(string roomName, int elo)
     {
         roomNameTxt.text = roomName;
-        playerNameTxt.text = playerName;
         eloTxt.text = elo.ToString();
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -12,6 +13,7 @@ public class BallGameLobby : MonoBehaviour
     public static BallGameLobby Instance { get; private set; }
 
     private Lobby joinedLobby;
+
 
     private void Awake()
     {
@@ -35,7 +37,7 @@ public class BallGameLobby : MonoBehaviour
         {
             InitializationOptions options= new InitializationOptions(); 
 
-            options.SetProfile(Random.Range(0, 100000).ToString()); 
+            options.SetProfile(UnityEngine.Random.Range(0, 100000).ToString()); 
 
             await UnityServices.InitializeAsync();
 
@@ -47,15 +49,17 @@ public class BallGameLobby : MonoBehaviour
     {
         try
         {
+            Debug.Log(lobbyName);
+
             joinedLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, BallGameMultiplayer.MAX_PLAYER_AMOUNT, new CreateLobbyOptions
             {
                 IsPrivate = isPrivate
             });
 
-            BallGameMultiplayer.Instance.StartHost();
+            // BallGameMultiplayer.Instance.StartHost();
             // SceneLoader.LoadNetwork(SceneLoader.Scene)
 
-            LobbyController.Instance.SetState(LobbyController.EMainMenuStateTmp.Lobby);
+            // LobbyController.Instance.SetState(LobbyController.EMainMenuStateTmp.Lobby);
         }
         catch (LobbyServiceException e)
         {
@@ -69,7 +73,7 @@ public class BallGameLobby : MonoBehaviour
         {
             joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync();
 
-            BallGameMultiplayer.Instance.StartClient();
+            // BallGameMultiplayer.Instance.StartClient();
 
             LobbyController.Instance.SetState(LobbyController.EMainMenuStateTmp.Lobby);
         }

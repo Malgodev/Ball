@@ -26,6 +26,8 @@ public class HomePanel : BaseUIPanel
 
             // CreateLobby();
 
+            BallGameLobby.Instance.CreateLobby(BallPlayerInfo.Instance.PlayerName, false);
+
             // MainMenuUIController.Instance.SetState(EMainMenuState.CreateLobby);
         });
 
@@ -43,23 +45,6 @@ public class HomePanel : BaseUIPanel
         rankingBtn.onClick.AddListener(() => {
             MainMenuUIController.Instance.SetState(EMainMenuState.Ranking);
         });
-    }
-
-    private async void CreateLobby()
-    {
-        try
-        {
-            string lobbyName = "TEST";
-            int maxPlayers = 2;
-
-            Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers);
-
-            Debug.Log($"Create Lobby {lobby.Name} Max players {lobby.MaxPlayers}");
-        } 
-        catch (LobbyServiceException e)
-        {
-            Debug.Log(e);
-        }
     }
 
     private void ExitGame()

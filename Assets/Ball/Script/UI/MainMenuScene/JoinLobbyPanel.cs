@@ -25,6 +25,11 @@ public class JoinLobbyPanel : BaseUIPanel
             MainMenuUIController.Instance.SetState(EMainMenuState.Home);
         });
 
+        
+    }
+
+    private void OnEnable()
+    {
         ListLobbies();
     }
 
@@ -34,21 +39,27 @@ public class JoinLobbyPanel : BaseUIPanel
         {
             QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
 
-            foreach (Lobby lobby in queryResponse.Results)
-            {
-                Debug.Log(lobby.Name + " " + lobby.MaxPlayers);
-            }
+            ClearLobbies();
 
-/*            for (int i = 0; i < 30; i++)
+            foreach (Lobby lobby in queryResponse.Results)
             {
                 GameObject lobbyInfo = Instantiate(lobbyInfoPrefab);
                 lobbyInfo.transform.SetParent(lobbiesHolder, false);
-                lobbyInfo.GetComponent<LobbyInfoController>().SetInfo(i.ToString(), i.ToString(), i);
-            }*/
+                lobbyInfo.GetComponent<LobbyInfoController>().SetInfo(lobby.Name, lobby.MaxPlayers);
+
+            }
         }
         catch (Exception ex)
         {
             Debug.LogException(ex);
+        }
+    }
+
+    private void ClearLobbies()
+    {
+        foreach (Transform child in lobbiesHolder.transform)
+        {
+            Destroy(child.gameObject);
         }
     }
 }

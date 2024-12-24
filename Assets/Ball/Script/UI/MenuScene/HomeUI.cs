@@ -5,6 +5,9 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
+
+// EXPRIRED
+ 
 public class HomeUI : NetworkBehaviour
 {
     [SerializeField] private TMP_InputField nameField;
@@ -16,7 +19,7 @@ public class HomeUI : NetworkBehaviour
     {
         createLobbyBtn.onClick.AddListener(() =>
         {
-            BallGameLobby.Instance.CreateLobby("Dead", false);
+            BallGameLobby.Instance.CreateLobby(BallPlayerInfo.Instance.PlayerName, false);
 
             //MainMenuController.Instance.SetState(MainMenuController.EMainMenuState.Lobby);
             //BallGameMultiplayer.Instance.StartHost();
@@ -24,7 +27,7 @@ public class HomeUI : NetworkBehaviour
 
         joinLobbyBtn.onClick.AddListener(() =>
         {
-            BallGameLobby.Instance.QuickJoin();
+            // BallGameLobby.Instance.QuickJoin();
             //MainMenuController.Instance.SetState(MainMenuController.EMainMenuState.Lobby);
             //BallGameMultiplayer.Instance.StartClient();
         });

@@ -1,4 +1,5 @@
 using Malgo.UI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -30,6 +31,15 @@ public class LobbyUIController : NetworkBehaviour
     private void Start()
     {
         roomName.text = BallPlayerInfo.Instance.PlayerName;
-        Debug.Log(roomName.text + " " + BallPlayerInfo.Instance.PlayerName);
+    }
+
+    private void Update()
+    {
+        HandleLobbyHeartBeat();
+    }
+
+    private void HandleLobbyHeartBeat()
+    {
+        
     }
 }
