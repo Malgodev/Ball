@@ -71,15 +71,39 @@ public class BallGameLobby : MonoBehaviour
     {
         try
         {
-            Debug.Log(lobbyName);
+            string playerName = BallPlayerInfo.Instance.PlayerName;
+            string playerElo = BallPlayerInfo.Instance.playerElo.ToString();
+
+            CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions
+            {
+                IsPrivate = isPrivate,
+                Player = new Player
+                {
+                    Data = new Dictionary<string, PlayerDataObject>
+                    {
+                        {
+                            "PlayerName",
+                            new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerName)
+                        },
+                        {
+                            "PlayerElo",
+                            new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerElo)
+                        }
+                    }
+                }
+            };
 
             lobby = await LobbyService.Instance.CreateLobbyAsync(
-                lobbyName, BallGameMultiplayer.MAX_PLAYER_AMOUNT, new CreateLobbyOptions
-            {
-                IsPrivate = isPrivate
-            });
+                lobbyName, BallGameMultiplayer.MAX_PLAYER_AMOUNT, createLobbyOptions);
 
             hostLobby = lobby;
+
+            PrintPlayer(lobby);
+
+            Debug.Log($"Create lobby: {lobbyName} \n " +
+                $"Code: {lobby.LobbyCode} \n " +
+                $"Id: {lobby.Id} \n" +
+                $"Max player: {lobby.MaxPlayers}");
 
             // BallGameMultiplayer.Instance.StartHost();
             // SceneLoader.LoadNetwork(SceneLoader.Scene)
@@ -134,4 +158,11 @@ public class BallGameLobby : MonoBehaviour
         }
     }
 
+    public void PrintPlayer(Lobby lobby)
+    {
+        foreach (Player player in lobby.Players)
+        {
+            Debug.Log(player.Id + " " + player.Data["PlayerName"].Value + " " + player.Data["PlayerElo"].Value);
+        }
+    }
 }

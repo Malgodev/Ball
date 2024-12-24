@@ -8,7 +8,7 @@ public class BallPlayerInfo : MonoBehaviour
 
     private string playerId;
     [field: SerializeField] public string PlayerName { get; private set; }
-    [field: SerializeField] private int playerElo;
+    [field: SerializeField] public int playerElo { get; private set; }
 
     private void Awake()
     {
