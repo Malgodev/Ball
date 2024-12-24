@@ -1,9 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Net.Http.Headers;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class MainMenuUIController : MonoBehaviour
 {
@@ -60,7 +55,7 @@ public class MainMenuUIController : MonoBehaviour
                 // createLobbyPanel.Show();
                 break;
             case EMainMenuState.JoinLobby:
-                joinLobbyPanel.Show();  
+                joinLobbyPanel.Show();
                 break;
             case EMainMenuState.Ranking:
                 rankingPanel.Show();
@@ -83,7 +78,7 @@ public class MainMenuUIController : MonoBehaviour
                 settingPanel.Hide();
                 break;
             case EMainMenuState.CreateLobby:
-                createLobbyPanel.Hide();    
+                createLobbyPanel.Hide();
                 break;
             case EMainMenuState.JoinLobby:
                 joinLobbyPanel.Hide();

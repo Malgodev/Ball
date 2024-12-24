@@ -85,7 +85,7 @@ public class PlayerController : NetworkBehaviour
     void Update()
     {
         SpeedControl();
-        
+
         UpdateDangerRate();
 
         if (frameCounter++ >= UPDATED_FRAME_INTERVAL)
@@ -187,7 +187,7 @@ public class PlayerController : NetworkBehaviour
 
         float radius = 0;
         float frame = 0;
-        
+
         // TODO hard code 12
         // Possible solution: using deltatime to check if 2sec has pass
         for (int i = 1; i <= 120; i++)
@@ -371,7 +371,7 @@ public class PlayerController : NetworkBehaviour
                 continue;
             }
 
-            if (playerController.Role != EPlayerRole.Goalkeeper && playerController.DangerRate <= minDangerRate) 
+            if (playerController.Role != EPlayerRole.Goalkeeper && playerController.DangerRate <= minDangerRate)
             {
                 bestPlayer = playerController.gameObject;
             }
@@ -418,13 +418,13 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-//#if UNITY_EDITOR
-//    private void OnDrawGizmos()
-//    {
-//        if (!Application.isPlaying)
-//        {
-//            return;
-//        }
+    //#if UNITY_EDITOR
+    //    private void OnDrawGizmos()
+    //    {
+    //        if (!Application.isPlaying)
+    //        {
+    //            return;
+    //        }
 
     //        string str = "";
     //        // Player velocity

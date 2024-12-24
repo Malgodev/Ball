@@ -1,7 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Netcode;
+using System;
 using UnityEngine;
+using System.Diagnostics;
+using Unity.Netcode;
 
 public class BallNetworkManager : NetworkManager
 {
@@ -26,6 +26,6 @@ public class BallNetworkManager : NetworkManager
 
     private void OnPlayerConnected(ulong clientId)
     {
-        
+        UnityEngine.Debug.Log("New player connected " + clientId); 
     }
 }

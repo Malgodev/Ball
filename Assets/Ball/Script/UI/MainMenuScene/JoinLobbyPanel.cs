@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -43,7 +41,8 @@ public class JoinLobbyPanel : BaseUIPanel
             {
                 GameObject lobbyInfo = Instantiate(lobbyInfoPrefab);
                 lobbyInfo.transform.SetParent(lobbiesHolder, false);
-                lobbyInfo.GetComponent<LobbyInfoController>().SetInfo(lobby.Id, lobby.LobbyCode, lobby.Name, lobby.MaxPlayers);
+                lobbyInfo.GetComponent<LobbyInfoController>().SetInfo(
+                    lobby.Id, lobby.Name, lobby.Data["LobbyElo"].Value);
 
             }
         }

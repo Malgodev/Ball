@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -110,7 +109,7 @@ public class GeneratePlayerInfo : MonoBehaviour
         }
 
         return playerList;
-        
+
     }
 
     static PlayerInfo CreatePlayerInfo(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
@@ -118,7 +117,7 @@ public class GeneratePlayerInfo : MonoBehaviour
         offset.y = (delta + 1) * (100 / (numberOfRolePlayer + 1));
         string name = role + " " + (delta + 1);
 
-        return new PlayerInfo() { PlayerName = name, Role = role, Offset = offset};
+        return new PlayerInfo() { PlayerName = name, Role = role, Offset = offset };
     }
 
     //static GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)

@@ -1,10 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Netcode;
-using Unity.VisualScripting;
-using UnityEngine;
 
 public class BallGameMultiplayer : NetworkBehaviour
 {
@@ -61,6 +57,6 @@ public class BallGameMultiplayer : NetworkBehaviour
 
     public UserData GetUserDataByClientId(ulong clientId)
     {
-        return UserDataList[(int) clientId];
+        return UserDataList[(int)clientId];
     }
 }

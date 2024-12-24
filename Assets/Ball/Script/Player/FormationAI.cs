@@ -102,7 +102,7 @@ public class FormationAI : NetworkBehaviour
     {
         ETeamHasBall teamHasBall = GameController.Instance.GetTeamHasBall();
 
-        bool havingBall = (teamHasBall == ETeamHasBall.TeamOne && IsTeamOne) || 
+        bool havingBall = (teamHasBall == ETeamHasBall.TeamOne && IsTeamOne) ||
                 (teamHasBall == ETeamHasBall.TeamTwo && !IsTeamOne);
 
         if (havingBall && smoothedPossessionBalance <= 0)
@@ -188,7 +188,7 @@ public class FormationAI : NetworkBehaviour
             PossessionBalance = Mathf.Lerp(PossessionBalance, fieldPositionFactor, Time.deltaTime * POSSESSION_SMOOTHING_SPEED);
 
         }
-        else if ((teamHasBall == ETeamHasBall.TeamOne && IsTeamOne) 
+        else if ((teamHasBall == ETeamHasBall.TeamOne && IsTeamOne)
                 || (teamHasBall == ETeamHasBall.TeamTwo && !IsTeamOne))
         {
             PossessionBalance = Mathf.Lerp(PossessionBalance, 1f, Time.deltaTime * POSSESSION_SMOOTHING_SPEED);

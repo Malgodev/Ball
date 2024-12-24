@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.LowLevel;
 
 [Serializable]
 public class TeamController : NetworkBehaviour
@@ -119,7 +118,7 @@ public class TeamController : NetworkBehaviour
             return;
         }
 
-        switch (userInput.InputState) 
+        switch (userInput.InputState)
         {
             case EPlayerState.Run:
                 ControlledPlayer.MoveByAxis(userInput.InputVector);
@@ -291,7 +290,7 @@ public class TeamController : NetworkBehaviour
         }
     }
 
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     private void SpawnPlayerByInfoServerRpc(PlayerInfo playerInfo)
     {
         // PlayerList
@@ -328,11 +327,11 @@ public class TeamController : NetworkBehaviour
             {
                 player.transform.SetParent(this.transform);
             }
-/*            else
-            {
-                networkObject?.Spawn();
-                player.transform.SetParent(this.transform);
-            }*/
+            /*            else
+                        {
+                            networkObject?.Spawn();
+                            player.transform.SetParent(this.transform);
+                        }*/
 
             player.name = playerController.Role.ToString() + " " + PlayerList.IndexOf(player);
 

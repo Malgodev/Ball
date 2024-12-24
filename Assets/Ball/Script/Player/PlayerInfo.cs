@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -35,8 +34,8 @@ public struct PlayerInfo : IEquatable<UserData>, INetworkSerializable
 }
 
 
-public enum EPlayerRole 
-{ 
+public enum EPlayerRole
+{
     Goalkeeper,
     Midfielder,
     Fullback,

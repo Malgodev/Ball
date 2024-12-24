@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
@@ -44,7 +42,8 @@ public class BallMovement : MonoBehaviour
             PredictPos.RemoveRange(0, 1);
             PredictPos.Add(LastPredictionPos(rb.velocity));
         }
-        else{
+        else
+        {
             PredictPos.Clear();
         }
     }

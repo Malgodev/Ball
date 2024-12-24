@@ -1,5 +1,3 @@
-using Unity.Services.Lobbies;
-using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UI;
 using static MainMenuUIController;
@@ -21,8 +19,8 @@ public class HomePanel : BaseUIPanel
         createLobbyBtn.onClick.AddListener(() =>
         {
             BallGameLobby.Instance.CreateLobby(BallPlayerInfo.Instance.PlayerName, false);
-            
-            SceneLoader.Load(SceneLoader.Scene.LobbyScene);
+
+            // SceneLoader.Load(SceneLoader.Scene.LobbyScene);
             // MainMenuUIController.Instance.SetState(EMainMenuState.CreateLobby);
         });
 
@@ -31,13 +29,15 @@ public class HomePanel : BaseUIPanel
             MainMenuUIController.Instance.SetState(EMainMenuState.JoinLobby);
         });
 
-        settingBtn.onClick.AddListener(() => {
+        settingBtn.onClick.AddListener(() =>
+        {
             MainMenuUIController.Instance.SetState(EMainMenuState.Setting);
         });
 
         exitGameBtn.onClick.AddListener(ExitGame);
 
-        rankingBtn.onClick.AddListener(() => {
+        rankingBtn.onClick.AddListener(() =>
+        {
             MainMenuUIController.Instance.SetState(EMainMenuState.Ranking);
         });
     }

@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -39,10 +36,10 @@ public class LobbyUIExpired : NetworkBehaviour
 
     private void Start()
     {
-/*        LobbyController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
-        LobbyController.Instance.OnReadyChanged += MainMenyController_OnReadyChanged;
-        BallGameMultiplayer.Instance.OnUserDataChanged += BallGameMultiplayer_OnUserDataChanged;
-        BallGameMultiplayer.Instance.OnUserDataChanged += MainMenyController_OnReadyChanged;*/
+        /*        LobbyController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
+                LobbyController.Instance.OnReadyChanged += MainMenyController_OnReadyChanged;
+                BallGameMultiplayer.Instance.OnUserDataChanged += BallGameMultiplayer_OnUserDataChanged;
+                BallGameMultiplayer.Instance.OnUserDataChanged += MainMenyController_OnReadyChanged;*/
     }
 
     private void MainMenyController_OnReadyChanged(object sender, System.EventArgs e)

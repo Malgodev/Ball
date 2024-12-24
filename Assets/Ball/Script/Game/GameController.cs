@@ -147,7 +147,7 @@ public class GameController : NetworkBehaviour
         {
             return;
         }
- 
+
         List<GameObject> playerList = new List<GameObject>();
 
         foreach (PlayerInfo playerInfo in playerInfos)

@@ -107,7 +107,7 @@ public class LobbyControllerExpired : NetworkBehaviour
         }
     }
 
-    public bool IsPlayerReady (ulong clientId)
+    public bool IsPlayerReady(ulong clientId)
     {
         if (!playerReadyDict.ContainsKey(clientId))
         {

@@ -1,7 +1,4 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
@@ -40,7 +37,8 @@ public class BallGameLobby : MonoBehaviour
 
     private async void HandleLobbyHeartbeat()
     {
-        if (hostLobby != null){
+        if (hostLobby != null)
+        {
             heartbeatTimer -= Time.deltaTime;
             if (heartbeatTimer < 0f)
             {
@@ -53,13 +51,18 @@ public class BallGameLobby : MonoBehaviour
         }
     }
 
+    private async void HandleLobbyPollUpdate()
+    {
+
+    }
+
     private async void InitUnityAuthentication()
     {
         if (UnityServices.State != ServicesInitializationState.Initialized)
         {
-            InitializationOptions options= new InitializationOptions(); 
+            InitializationOptions options = new InitializationOptions();
 
-            options.SetProfile(UnityEngine.Random.Range(0, 100000).ToString()); 
+            options.SetProfile(UnityEngine.Random.Range(0, 100000).ToString());
 
             await UnityServices.InitializeAsync();
 
@@ -77,20 +80,8 @@ public class BallGameLobby : MonoBehaviour
             CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions
             {
                 IsPrivate = isPrivate,
-                Player = new Player
-                {
-                    Data = new Dictionary<string, PlayerDataObject>
-                    {
-                        {
-                            "PlayerName",
-                            new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerName)
-                        },
-                        {
-                            "PlayerElo",
-                            new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerElo)
-                        }
-                    }
-                }
+                Data = GetLobbyData(playerElo),
+                Player = GetPlayer(playerName, playerElo)
             };
 
             lobby = await LobbyService.Instance.CreateLobbyAsync(
@@ -98,21 +89,19 @@ public class BallGameLobby : MonoBehaviour
 
             hostLobby = lobby;
 
-            PrintPlayer(lobby);
-
             Debug.Log($"Create lobby: {lobbyName} \n " +
                 $"Code: {lobby.LobbyCode} \n " +
                 $"Id: {lobby.Id} \n" +
                 $"Max player: {lobby.MaxPlayers}");
 
-            // BallGameMultiplayer.Instance.StartHost();
-            // SceneLoader.LoadNetwork(SceneLoader.Scene)
+            BallGameMultiplayer.Instance.StartHost();
+            SceneLoader.LoadNetwork(SceneLoader.Scene.LobbyScene);
 
             // LobbyController.Instance.SetState(LobbyController.EMainMenuStateTmp.Lobby);
         }
         catch (LobbyServiceException e)
         {
-            Debug.LogError(e); 
+            Debug.LogError(e);
         }
     }
 
@@ -136,19 +125,34 @@ public class BallGameLobby : MonoBehaviour
     {
         try
         {
+
             Lobby joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(lobbyCode);
 
-            Debug.Log("Joined Lobby with code: " + lobbyCode + "with name" + joinedLobby.Name);  
-        }catch (LobbyServiceException e)
+            Debug.Log("Joined Lobby with code: " + lobbyCode + "with name" + joinedLobby.Name);
+        }
+        catch (LobbyServiceException e)
         {
-            Debug.LogError(e);  
+            Debug.LogError(e);
         }
     }
+
     public async void JoinLobbyById(string lobbyId)
     {
         try
         {
-            Lobby joinedLobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyId);
+            string playerName = BallPlayerInfo.Instance.PlayerName;
+            string playerElo = BallPlayerInfo.Instance.playerElo.ToString();
+
+            JoinLobbyByIdOptions joinLobbyByIdOptions = new JoinLobbyByIdOptions
+            {
+                Player = GetPlayer(playerName, playerElo)
+            };
+
+
+            Lobby joinedLobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyId, joinLobbyByIdOptions);
+
+            BallGameMultiplayer.Instance.StartClient();
+            SceneLoader.LoadNetwork(SceneLoader.Scene.LobbyScene);
 
             Debug.Log("Joined Lobby with code: " + lobbyId + "with name" + joinedLobby.Name);
         }
@@ -156,6 +160,33 @@ public class BallGameLobby : MonoBehaviour
         {
             Debug.LogError(e);
         }
+    }
+
+    private Dictionary<string, DataObject> GetLobbyData(string playerElo)
+    {
+        return new Dictionary<string, DataObject>
+        {
+            {"LobbyElo",
+            new DataObject(DataObject.VisibilityOptions.Public, playerElo)}
+        };
+    }
+
+    private Player GetPlayer(string playerName, string playerElo)
+    {
+        return new Player
+        {
+            Data = new Dictionary<string, PlayerDataObject>
+            {
+                {
+                    "PlayerName",
+                    new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerName)
+                },
+                {
+                    "PlayerElo",
+                    new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerElo)
+                }
+            }
+        };
     }
 
     public void PrintPlayer(Lobby lobby)

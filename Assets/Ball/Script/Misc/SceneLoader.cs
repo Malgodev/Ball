@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public static class SceneLoader 
+public static class SceneLoader
 {
     public enum Scene
     {
