@@ -24,8 +24,6 @@ public class JoinLobbyPanel : BaseUIPanel
         {
             MainMenuUIController.Instance.SetState(EMainMenuState.Home);
         });
-
-        
     }
 
     private void OnEnable()
@@ -45,7 +43,7 @@ public class JoinLobbyPanel : BaseUIPanel
             {
                 GameObject lobbyInfo = Instantiate(lobbyInfoPrefab);
                 lobbyInfo.transform.SetParent(lobbiesHolder, false);
-                lobbyInfo.GetComponent<LobbyInfoController>().SetInfo(lobby.Name, lobby.MaxPlayers);
+                lobbyInfo.GetComponent<LobbyInfoController>().SetInfo(lobby.Id, lobby.LobbyCode, lobby.Name, lobby.MaxPlayers);
 
             }
         }

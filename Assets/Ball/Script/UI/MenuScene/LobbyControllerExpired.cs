@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class LobbyController : NetworkBehaviour
+public class LobbyControllerExpired : NetworkBehaviour
 {
-    public static LobbyController Instance { get; private set; }
+    public static LobbyControllerExpired Instance { get; private set; }
 
     public enum EMainMenuStateTmp
     {

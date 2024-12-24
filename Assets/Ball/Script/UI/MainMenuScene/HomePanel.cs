@@ -20,14 +20,9 @@ public class HomePanel : BaseUIPanel
     {
         createLobbyBtn.onClick.AddListener(() =>
         {
-            // Testing
+            BallGameLobby.Instance.CreateLobby(BallPlayerInfo.Instance.PlayerName, false);
             
             SceneLoader.Load(SceneLoader.Scene.LobbyScene);
-
-            // CreateLobby();
-
-            BallGameLobby.Instance.CreateLobby(BallPlayerInfo.Instance.PlayerName, false);
-
             // MainMenuUIController.Instance.SetState(EMainMenuState.CreateLobby);
         });
 

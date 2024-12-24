@@ -6,7 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LobbyUI : NetworkBehaviour
+public class LobbyUIExpired : NetworkBehaviour
 {
     [field: Header("Button")]
 
@@ -28,12 +28,12 @@ public class LobbyUI : NetworkBehaviour
         returnBtn.onClick.AddListener(() =>
         {
             NetworkManager.Singleton.Shutdown();
-            LobbyController.Instance.SetState(LobbyController.EMainMenuStateTmp.Home);
+            LobbyControllerExpired.Instance.SetState(LobbyControllerExpired.EMainMenuStateTmp.Home);
         });
 
         readyBtn.onClick.AddListener(() =>
         {
-            LobbyController.Instance.SetLocalPlayerReady();
+            LobbyControllerExpired.Instance.SetLocalPlayerReady();
         });
     }
 
@@ -47,8 +47,8 @@ public class LobbyUI : NetworkBehaviour
 
     private void MainMenyController_OnReadyChanged(object sender, System.EventArgs e)
     {
-        bool isPlayerOneReady = LobbyController.Instance.IsPlayerReady(0);
-        bool isPlayerTwoReady = LobbyController.Instance.IsPlayerReady(1);
+        bool isPlayerOneReady = LobbyControllerExpired.Instance.IsPlayerReady(0);
+        bool isPlayerTwoReady = LobbyControllerExpired.Instance.IsPlayerReady(1);
 
         playerOneIsReadyTxt.text = isPlayerOneReady ? "Ready" : "Not ready";
         playerTwoIsReadyTxt.text = isPlayerTwoReady ? "Ready" : "Not ready";
@@ -79,7 +79,7 @@ public class LobbyUI : NetworkBehaviour
     private void MainMenuController_OnMenuStateChanged(object sender, System.EventArgs e)
     {
         // ? thừa
-        if (LobbyController.Instance.State == LobbyController.EMainMenuStateTmp.Lobby)
+        if (LobbyControllerExpired.Instance.State == LobbyControllerExpired.EMainMenuStateTmp.Lobby)
         {
             Show();
         }

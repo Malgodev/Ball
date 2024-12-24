@@ -32,14 +32,4 @@ public class LobbyUIController : NetworkBehaviour
     {
         roomName.text = BallPlayerInfo.Instance.PlayerName;
     }
-
-    private void Update()
-    {
-        HandleLobbyHeartBeat();
-    }
-
-    private void HandleLobbyHeartBeat()
-    {
-        
-    }
 }

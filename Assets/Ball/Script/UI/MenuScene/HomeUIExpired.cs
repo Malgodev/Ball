@@ -5,10 +5,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-
-// EXPRIRED
- 
-public class HomeUI : NetworkBehaviour
+public class HomeUIExpired : NetworkBehaviour
 {
     [SerializeField] private TMP_InputField nameField;
 
@@ -35,13 +32,13 @@ public class HomeUI : NetworkBehaviour
 
     private void Start()
     {
-        LobbyController.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
+        LobbyControllerExpired.Instance.OnMenuStateChanged += MainMenuController_OnMenuStateChanged;
     }
 
     private void MainMenuController_OnMenuStateChanged(object sender, System.EventArgs e)
     {
         // ? thừa
-        if (LobbyController.Instance.State == LobbyController.EMainMenuStateTmp.Home)
+        if (LobbyControllerExpired.Instance.State == LobbyControllerExpired.EMainMenuStateTmp.Home)
         {
             Show();
         }

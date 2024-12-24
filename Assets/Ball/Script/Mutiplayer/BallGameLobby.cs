@@ -12,7 +12,10 @@ public class BallGameLobby : MonoBehaviour
 {
     public static BallGameLobby Instance { get; private set; }
 
-    private Lobby joinedLobby;
+    private Lobby lobby;
+    private Lobby hostLobby;
+
+    private float heartbeatTimer = 0;
 
 
     private void Awake()
@@ -30,6 +33,25 @@ public class BallGameLobby : MonoBehaviour
         InitUnityAuthentication();
     }
 
+    private void Update()
+    {
+        HandleLobbyHeartbeat();
+    }
+
+    private async void HandleLobbyHeartbeat()
+    {
+        if (hostLobby != null){
+            heartbeatTimer -= Time.deltaTime;
+            if (heartbeatTimer < 0f)
+            {
+                float heartbeatTimerMax = 15;
+
+                heartbeatTimer = heartbeatTimerMax;
+
+                await LobbyService.Instance.SendHeartbeatPingAsync(hostLobby.Id);
+            }
+        }
+    }
 
     private async void InitUnityAuthentication()
     {
@@ -51,10 +73,13 @@ public class BallGameLobby : MonoBehaviour
         {
             Debug.Log(lobbyName);
 
-            joinedLobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, BallGameMultiplayer.MAX_PLAYER_AMOUNT, new CreateLobbyOptions
+            lobby = await LobbyService.Instance.CreateLobbyAsync(
+                lobbyName, BallGameMultiplayer.MAX_PLAYER_AMOUNT, new CreateLobbyOptions
             {
                 IsPrivate = isPrivate
             });
+
+            hostLobby = lobby;
 
             // BallGameMultiplayer.Instance.StartHost();
             // SceneLoader.LoadNetwork(SceneLoader.Scene)
@@ -71,15 +96,42 @@ public class BallGameLobby : MonoBehaviour
     {
         try
         {
-            joinedLobby = await LobbyService.Instance.QuickJoinLobbyAsync();
+            lobby = await LobbyService.Instance.QuickJoinLobbyAsync();
 
             // BallGameMultiplayer.Instance.StartClient();
 
-            LobbyController.Instance.SetState(LobbyController.EMainMenuStateTmp.Lobby);
+            LobbyControllerExpired.Instance.SetState(LobbyControllerExpired.EMainMenuStateTmp.Lobby);
         }
         catch (LobbyServiceException e)
         {
             Debug.LogError(e);
         }
     }
+
+    public async void JoinLobbyByCode(string lobbyCode)
+    {
+        try
+        {
+            Lobby joinedLobby = await Lobbies.Instance.JoinLobbyByCodeAsync(lobbyCode);
+
+            Debug.Log("Joined Lobby with code: " + lobbyCode + "with name" + joinedLobby.Name);  
+        }catch (LobbyServiceException e)
+        {
+            Debug.LogError(e);  
+        }
+    }
+    public async void JoinLobbyById(string lobbyId)
+    {
+        try
+        {
+            Lobby joinedLobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyId);
+
+            Debug.Log("Joined Lobby with code: " + lobbyId + "with name" + joinedLobby.Name);
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.LogError(e);
+        }
+    }
+
 }
