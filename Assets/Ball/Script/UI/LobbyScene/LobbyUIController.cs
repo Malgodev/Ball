@@ -10,9 +10,9 @@ using System.Collections.Generic;
 
 public class LobbyUIController : MonoBehaviour
 {
-    private string playerId = "Player1"; // Sample playerId
-    private string playerName = "Malgo"; // Sample playerName
-    private string roomId = "match_123";
+    private string playerId = "N/A"; // Sample playerId
+    private string playerName = "N/A"; // Sample playerName
+    private string roomId = "N/A";
     private Queue<Action> mainThreadActions = new Queue<Action>();
 
     private SocketIOUnity socket;
@@ -74,17 +74,25 @@ public class LobbyUIController : MonoBehaviour
 
     public void SetLobbyInfo()
     {
+        //        private string playerId = "Player1"; // Sample playerId
+        //private string playerName = "Malgo"; // Sample playerName
+        //private string roomId = "match_123";
+
+        playerId = BallPlayerInfo.Instance.PlayerName;
+        playerName = BallPlayerInfo.Instance.PlayerName;
+        roomId = BallGameLobby.Instance.LobbyName;
+
+
         roomName.text = BallGameLobby.Instance.LobbyName;
 
         List<PlayerInfo> playerList = BallGameLobby.Instance.GetPlayerInfoList();
 
-        foreach (PlayerInfo playerInfo in playerList)
-        {
-            Debug.Log(playerInfo);
-        }
-
         playerOneInfoTxt.text = playerList[0].PlayerName;
-        playerTwoInfoTxt.text = playerList[1].PlayerName;
+
+        if (playerList.Count > 1)
+        {
+            playerTwoInfoTxt.text = playerList[1].PlayerName;
+        };
     }
     
 
@@ -101,11 +109,6 @@ public class LobbyUIController : MonoBehaviour
                 playerTwoIsReadyTxt.text = playerReadyDict[clientId] ? "Ready" : "Not ready";
             }
         }
-    }
-
-    private void setupChat()
-    {
-        
     }
 
     private void EnqueueMainThreadAction(Action action)
@@ -168,7 +171,9 @@ public class LobbyUIController : MonoBehaviour
 
         try
         {
-            var messageGO = Instantiate(messagePrefab, chatContainer);
+            var messageGO = Instantiate(messagePrefab);
+
+            messageGO.transform.SetParent(chatContainer.transform, false);
 
             if (messageGO == null)
             {
