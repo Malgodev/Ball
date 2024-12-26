@@ -26,6 +26,5 @@ public class BallNetworkManager : NetworkManager
 
     private void OnPlayerConnected(ulong clientId)
     {
-        UnityEngine.Debug.Log("New player connected " + clientId); 
     }
 }

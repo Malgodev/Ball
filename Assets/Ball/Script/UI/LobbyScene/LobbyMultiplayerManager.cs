@@ -32,15 +32,25 @@ public class LobbyMultiplayerManager : NetworkBehaviour
         playerReadyDict = new Dictionary<ulong, bool>();
     }
 
-    private void Start()
-    {
-    }
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+
+        SetLobbyInfoServerRpc(); 
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    public void SetLobbyInfoServerRpc()
+    {
+        SetLobbyInfoClientRpc();
+    }
+
+    [ClientRpc]
+    public void SetLobbyInfoClientRpc()
+    {
+        lobbyUIController.SetLobbyInfo();
+    }
+    
     public void SetLocalPlayerReady()
     {
         SetPlayerReadyServerRpc();
@@ -63,12 +73,33 @@ public class LobbyMultiplayerManager : NetworkBehaviour
 
         SetPlayerReadyClientRpc(serverRpcParams.Receive.SenderClientId, playerReadyDict[clientId]);
 
+        bool isAllPlayerReady = true;
+
+        foreach (ulong id in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            if (!playerReadyDict.ContainsKey(id) || !playerReadyDict[id])
+            {
+                isAllPlayerReady = false;
+                break;
+            }
+        }
+
+        if (isAllPlayerReady)
+        {
+            Debug.Log("All player ready: Game start");
+            SceneLoader.LoadNetwork(SceneLoader.Scene.GameScene);
+        }
+        else
+        {
+            Debug.Log("Waiting for player");
+        }
     }
 
     [ClientRpc]
     private void SetPlayerReadyClientRpc(ulong clientId, bool isReady)
     {
         playerReadyDict[clientId] = isReady;
+        lobbyUIController.SetPlayerReadyUI(playerReadyDict);
         OnPlayerInfoChanged?.Invoke(this, EventArgs.Empty);
     }
 }

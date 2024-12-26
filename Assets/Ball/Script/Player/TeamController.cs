@@ -277,9 +277,9 @@ public class TeamController : NetworkBehaviour
 
 
     [ClientRpc]
-    public void SetPlayerListClientRpc(PlayerInfo[] playerInfoList)
+    public void SetPlayerListClientRpc(SoccerPlayerInfo[] playerInfoList)
     {
-        foreach (PlayerInfo playerInfo in playerInfoList)
+        foreach (SoccerPlayerInfo playerInfo in playerInfoList)
         {
             SpawnPlayerByInfoServerRpc(playerInfo);
         }
@@ -291,7 +291,7 @@ public class TeamController : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SpawnPlayerByInfoServerRpc(PlayerInfo playerInfo)
+    private void SpawnPlayerByInfoServerRpc(SoccerPlayerInfo playerInfo)
     {
         // PlayerList
         GameObject newPlayer = Instantiate(GameController.Instance.PlayerPrefab);

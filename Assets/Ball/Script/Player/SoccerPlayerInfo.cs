@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using Unity.Netcode;
 using UnityEngine;
 
-public struct PlayerInfo : IEquatable<PlayerInfo>, INetworkSerializable
+public struct SoccerPlayerInfo : IEquatable<SoccerPlayerInfo>, INetworkSerializable
 {
     public string PlayerName;
     public EPlayerRole Role;
     public Vector2 Offset;
 
-    public bool Equals(PlayerInfo other)
+    public bool Equals(SoccerPlayerInfo other)
     {
         return PlayerName == other.PlayerName;
     }
@@ -33,6 +34,16 @@ public struct PlayerInfo : IEquatable<PlayerInfo>, INetworkSerializable
     }
 }
 
+public struct PlayerInfo
+{
+    public string PlayerName;
+    public int PlayerElo;
+
+    public override string ToString()
+    {
+        return $"PlayerName {PlayerName} Elo {PlayerElo}";
+    }
+}
 
 public enum EPlayerRole
 {

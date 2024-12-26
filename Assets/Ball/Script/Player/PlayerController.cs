@@ -67,7 +67,7 @@ public class PlayerController : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void SetPlayerInfoClientRpc(PlayerInfo playerInfo, bool IsTeamOne, Vector2 initPos)
+    public void SetPlayerInfoClientRpc(SoccerPlayerInfo playerInfo, bool IsTeamOne, Vector2 initPos)
     {
         this.Role = playerInfo.Role;
         this.DefaultOffset = playerInfo.Offset;

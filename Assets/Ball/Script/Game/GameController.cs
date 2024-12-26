@@ -141,7 +141,7 @@ public class GameController : NetworkBehaviour
 
     private void GeneratePlayer(TeamController teamController, ulong clientId)
     {
-        PlayerInfo[] playerInfos = GeneratePlayerInfo.GetPlayerInfo(teamController);
+        SoccerPlayerInfo[] playerInfos = GeneratePlayerInfo.GetPlayerInfo(teamController);
 
         if (playerInfos == null)
         {
@@ -150,7 +150,7 @@ public class GameController : NetworkBehaviour
 
         List<GameObject> playerList = new List<GameObject>();
 
-        foreach (PlayerInfo playerInfo in playerInfos)
+        foreach (SoccerPlayerInfo playerInfo in playerInfos)
         {
             GameObject newPlayer = Instantiate(GameController.Instance.PlayerPrefab);
 

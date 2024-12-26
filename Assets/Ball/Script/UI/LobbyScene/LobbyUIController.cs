@@ -1,7 +1,6 @@
 using Malgo.UI;
 using System.Collections.Generic;
 using TMPro;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,29 +28,40 @@ public class LobbyUIController : MonoBehaviour
 
     private void Start()
     {
-        roomName.text = BallPlayerInfo.Instance.PlayerName;
-
-        readyBtn.onClick.AddListener(() =>
+        readyBtn.onClick.AddListener(() =>    
         {
             LobbyMultiplayerManager.Instance.SetLocalPlayerReady();
         });
 
     }
 
-    public void SetPlayerInfoUI(Dictionary<string, bool> playerReadyDict)
+    public void SetLobbyInfo()
     {
-        int index = 0;
-        foreach (string playerName in playerReadyDict.Keys)
+        roomName.text = BallGameLobby.Instance.LobbyName;
+
+        List<PlayerInfo> playerList = BallGameLobby.Instance.GetPlayerInfoList();
+
+        foreach (PlayerInfo playerInfo in playerList)
         {
-            if (index++ == 0)
+            Debug.Log(playerInfo);
+        }
+
+        playerOneInfoTxt.text = playerList[0].PlayerName;
+        playerTwoInfoTxt.text = playerList[1].PlayerName;
+    }
+    
+
+    public void SetPlayerReadyUI(Dictionary<ulong, bool> playerReadyDict)
+    {
+        foreach (ulong clientId in playerReadyDict.Keys)
+        {
+            if (clientId == 0)
             {
-                playerOneInfoTxt.text = playerName;
-                playerOneIsReadyTxt.text = playerReadyDict[playerName] ? "Ready" : "Not ready";
+                playerOneIsReadyTxt.text = playerReadyDict[clientId] ? "Ready" : "Not ready";
             }
             else
             {
-                playerTwoInfoTxt.text = playerName;
-                playerTwoIsReadyTxt.text = playerReadyDict[playerName] ? "Ready" : "Not ready";
+                playerTwoIsReadyTxt.text = playerReadyDict[clientId] ? "Ready" : "Not ready";
             }
         }
     }

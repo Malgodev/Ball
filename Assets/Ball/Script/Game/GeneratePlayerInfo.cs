@@ -8,7 +8,7 @@ public class GeneratePlayerInfo : MonoBehaviour
 
     // Generate player by TeamController
     // @param the team that want to generate
-    public static PlayerInfo[] GetPlayerInfo(TeamController teamController)
+    public static SoccerPlayerInfo[] GetPlayerInfo(TeamController teamController)
     {
         if (!NetworkManager.Singleton.IsServer)
         {
@@ -27,9 +27,9 @@ public class GeneratePlayerInfo : MonoBehaviour
         }
     }
 
-    static List<PlayerInfo> CreateFormation(List<EPlayerRole> playerRole)
+    static List<SoccerPlayerInfo> CreateFormation(List<EPlayerRole> playerRole)
     {
-        List<PlayerInfo> playerList = new List<PlayerInfo>();
+        List<SoccerPlayerInfo> playerList = new List<SoccerPlayerInfo>();
 
         int numberOfFrontline = 0;
         int numberOfMidfield = 0;
@@ -112,12 +112,12 @@ public class GeneratePlayerInfo : MonoBehaviour
 
     }
 
-    static PlayerInfo CreatePlayerInfo(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
+    static SoccerPlayerInfo CreatePlayerInfo(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)
     {
         offset.y = (delta + 1) * (100 / (numberOfRolePlayer + 1));
         string name = role + " " + (delta + 1);
 
-        return new PlayerInfo() { PlayerName = name, Role = role, Offset = offset };
+        return new SoccerPlayerInfo() { PlayerName = name, Role = role, Offset = offset };
     }
 
     //static GameObject CreatePlayer(EPlayerRole role, Vector2 offset, int numberOfRolePlayer, int delta)

@@ -15,7 +15,6 @@ public class LobbyInfoController : MonoBehaviour
     {
         joinBtn.onClick.AddListener(() =>
         {
-            Debug.Log(lobbyId);
             BallGameLobby.Instance.JoinLobbyById(lobbyId);
         });
     }

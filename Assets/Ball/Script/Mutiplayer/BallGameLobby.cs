@@ -21,8 +21,19 @@ public class BallGameLobby : MonoBehaviour
     private Lobby lobby;
     private Lobby hostLobby;
 
-    private float heartbeatTimer = 0;
+    public bool IsHost 
+    {
+        get { return hostLobby != null; }
+        private set { }
+    }
 
+    public string LobbyName
+    {
+        get { return lobby.Name; }
+    }
+
+    private float heartbeatTimer = 0;
+    private float pollTimer = 0;
 
     private void Awake()
     {
@@ -42,6 +53,7 @@ public class BallGameLobby : MonoBehaviour
     private void Update()
     {
         HandleLobbyHeartbeat();
+        HandleLobbyPollUpdate();
     }
 
     private async void HandleLobbyHeartbeat()
@@ -62,7 +74,25 @@ public class BallGameLobby : MonoBehaviour
 
     private async void HandleLobbyPollUpdate()
     {
+        if (hostLobby != null)
+        {
+            pollTimer -= Time.deltaTime;
+            if (pollTimer < 0f)
+            {
+                float pollTimerMax = 3f;
 
+                pollTimer = pollTimerMax;
+
+                try
+                {
+                    lobby = await LobbyService.Instance.GetLobbyAsync(lobby.Id);
+                }
+                catch (LobbyServiceException e)
+                {
+                    Debug.LogError(e);
+                }
+            }
+        }
     }
 
     private async void InitUnityAuthentication()
@@ -225,7 +255,7 @@ public class BallGameLobby : MonoBehaviour
             BallGameMultiplayer.Instance.StartClient();
             SceneLoader.LoadNetwork(SceneLoader.Scene.LobbyScene);
 
-            Debug.Log("Joined Lobby with code: " + lobbyId + "with name" + lobby.Name);
+            Debug.Log("Joined Lobby with code: " + lobbyId + " with name: " + lobby.Name);
         }
         catch (LobbyServiceException e)
         {
@@ -265,6 +295,37 @@ public class BallGameLobby : MonoBehaviour
         foreach (Player player in lobby.Players)
         {
             Debug.Log(player.Id + " " + player.Data["PlayerName"].Value + " " + player.Data["PlayerElo"].Value);
+        }
+    }
+
+    public List<PlayerInfo> GetPlayerInfoList()
+    {
+        List<PlayerInfo> playerList = new List<PlayerInfo>();
+
+        foreach (Player player in lobby.Players)
+        {
+            PlayerInfo playerInfo = new PlayerInfo
+            {
+                PlayerName = player.Data["PlayerName"].Value,
+                PlayerElo = int.Parse(player.Data["PlayerElo"].Value)
+            };
+
+            playerList.Add(playerInfo);
+        }
+
+        return playerList;
+    }
+
+    private async void LeaveLobbyAsync()
+    {
+        try
+        {
+            await LobbyService.Instance.RemovePlayerAsync(lobby.Id, AuthenticationService.Instance.PlayerId);
+            Debug.Log("Left the lobby.");
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.LogError($"Failed to leave lobby: {e.Message}");
         }
     }
 }
