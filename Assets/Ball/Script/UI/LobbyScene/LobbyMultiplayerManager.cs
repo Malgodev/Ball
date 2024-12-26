@@ -1,33 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.VisualScripting;
 using UnityEngine;
-
-public struct LobbyPlayerInfo : IEquatable<LobbyPlayerInfo>, INetworkSerializable
-{
-    public string PlayerName;
-    public int PlayerElo;
-    public bool IsPlayerReady;
-
-    public bool Equals(LobbyPlayerInfo other)
-    {
-        return PlayerName == other.PlayerName;
-    }
-
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref PlayerName);
-        serializer.SerializeValue(ref PlayerElo);
-        serializer.SerializeValue(ref IsPlayerReady);
-    }
-
-    public override string ToString()
-    {
-        return $"Player name: {PlayerName} Elo: {PlayerElo} IsReady: {IsPlayerReady}";
-    }
-}
 
 public class LobbyMultiplayerManager : NetworkBehaviour
 {
@@ -42,8 +16,7 @@ public class LobbyMultiplayerManager : NetworkBehaviour
 
     [field: Header("Script")]
     public bool IsLocalPlayerReady { get; private set; } = false;
-    private NetworkVariable<LobbyPlayerInfo> playerOneInfo = new NetworkVariable<LobbyPlayerInfo>();
-    private NetworkVariable<LobbyPlayerInfo> playerTwoInfo = new NetworkVariable<LobbyPlayerInfo>();
+    private Dictionary<ulong, bool> playerReadyDict;
 
     private void Awake()
     {
@@ -56,90 +29,46 @@ public class LobbyMultiplayerManager : NetworkBehaviour
             Instance = this;
         }
 
-        OnPlayerInfoChanged += LobbyMultiplayerManager_OnPlayerInfoChanged;
-    }
-    private void LobbyMultiplayerManager_OnPlayerInfoChanged(object sender, EventArgs e)
-    {
-        lobbyUIController.SetPlayerInfoUI(playerOneInfo.Value, playerTwoInfo.Value);    
+        playerReadyDict = new Dictionary<ulong, bool>();
     }
 
     private void Start()
     {
     }
 
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-
-
-        playerOneInfo.OnValueChanged += (previous, current) =>
-        {
-            OnPlayerInfoChanged?.Invoke(this, EventArgs.Empty);
-        };
-
-
-        playerTwoInfo.OnValueChanged += (previous, current) =>
-        {
-            OnPlayerInfoChanged?.Invoke(this, EventArgs.Empty);
-        };
-
-        if (IsServer)
-        {
-            playerOneInfo.Value = new LobbyPlayerInfo
-            {
-                PlayerName = BallPlayerInfo.Instance.PlayerName,
-                PlayerElo = BallPlayerInfo.Instance.PlayerElo,
-                IsPlayerReady = false
-            };
-
-            playerTwoInfo.Value = new LobbyPlayerInfo
-            {
-                PlayerName = "Bot",
-                PlayerElo = 0,
-                IsPlayerReady = true
-            };
-        }
     }
 
-    [ServerRpc(RequireOwnership = false)]
-    public void SetLocalPlayerReadyServerRpc(string playerName)
+    public void SetLocalPlayerReady()
     {
-        NetworkVariable<LobbyPlayerInfo> localPlayer = GetLocalPlayer(playerName);
+        SetPlayerReadyServerRpc();
+    }
 
-        Debug.Log(localPlayer.Value);
 
-        if (localPlayer != null)
+    [ServerRpc(RequireOwnership=false)]
+    private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        ulong clientId = serverRpcParams.Receive.SenderClientId;
+
+        if (!playerReadyDict.ContainsKey(clientId))
         {
-            LobbyPlayerInfo updatedInfo = localPlayer.Value;
-            updatedInfo.IsPlayerReady = !updatedInfo.IsPlayerReady;
-
-            localPlayer.Value = updatedInfo;
-
-            Debug.Log(updatedInfo + " \n" + localPlayer.Value + " " + IsServer);
+            playerReadyDict[clientId] = true;
         }
         else
         {
-            Debug.LogError("SetLocalPlayerReady: Local player not found");
+            playerReadyDict[clientId] = !playerReadyDict[clientId];
         }
 
-        Debug.Log(localPlayer.Value);
+        SetPlayerReadyClientRpc(serverRpcParams.Receive.SenderClientId, playerReadyDict[clientId]);
+
     }
 
-    public NetworkVariable<LobbyPlayerInfo> GetLocalPlayer(string playerName)
+    [ClientRpc]
+    private void SetPlayerReadyClientRpc(ulong clientId, bool isReady)
     {
-        if (playerOneInfo.Value.PlayerName == playerName)
-        {
-            return playerOneInfo;
-        }
-        else if (playerTwoInfo.Value.PlayerName == playerName)
-        {
-            return playerTwoInfo;
-        }
-        else
-        {
-            Debug.LogError("Local player not found");
-            return null;
-        }
+        playerReadyDict[clientId] = isReady;
+        OnPlayerInfoChanged?.Invoke(this, EventArgs.Empty);
     }
 }

@@ -1,4 +1,5 @@
 using Malgo.UI;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -32,16 +33,26 @@ public class LobbyUIController : MonoBehaviour
 
         readyBtn.onClick.AddListener(() =>
         {
-            LobbyMultiplayerManager.Instance.SetLocalPlayerReadyServerRpc(BallPlayerInfo.Instance.PlayerName);
+            LobbyMultiplayerManager.Instance.SetLocalPlayerReady();
         });
+
     }
 
-    public void SetPlayerInfoUI(LobbyPlayerInfo playerOne, LobbyPlayerInfo playerTwo)
+    public void SetPlayerInfoUI(Dictionary<string, bool> playerReadyDict)
     {
-        playerOneInfoTxt.text = playerOne.PlayerName;
-        playerOneIsReadyTxt.text = playerOne.IsPlayerReady ? "Ready" : "Not ready";
-
-        playerTwoInfoTxt.text = playerTwo.PlayerName;
-        playerTwoIsReadyTxt.text = playerTwo.IsPlayerReady ? "Ready" : "Not ready";
+        int index = 0;
+        foreach (string playerName in playerReadyDict.Keys)
+        {
+            if (index++ == 0)
+            {
+                playerOneInfoTxt.text = playerName;
+                playerOneIsReadyTxt.text = playerReadyDict[playerName] ? "Ready" : "Not ready";
+            }
+            else
+            {
+                playerTwoInfoTxt.text = playerName;
+                playerTwoIsReadyTxt.text = playerReadyDict[playerName] ? "Ready" : "Not ready";
+            }
+        }
     }
 }
