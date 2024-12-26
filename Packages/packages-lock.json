@@ -1,5 +1,14 @@
 {
   "dependencies": {
+    "com.itisnajim.socketiounity": {
+      "version": "https://github.com/itisnajim/SocketIOUnity.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2"
+      },
+      "hash": "c9e06b15391449ad42fd9b0f39fea48054751bcd"
+    },
     "com.unity.2d.animation": {
       "version": "9.1.1",
       "depth": 1,
