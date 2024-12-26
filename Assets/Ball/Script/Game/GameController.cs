@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameController : NetworkBehaviour
 {
@@ -34,6 +35,10 @@ public class GameController : NetworkBehaviour
     public event EventHandler OnStateChanged;
     public event EventHandler OnInteractAction;
     public event EventHandler OnLocalPlayerReadyChange;
+
+    [SerializeField] public FixedJoystick joystick;
+    [SerializeField] public Button shotBtn;
+    [SerializeField] public Button passBtn;
 
     // remove this
     public bool IsLocalPlayerReady { get; private set; } = false;
