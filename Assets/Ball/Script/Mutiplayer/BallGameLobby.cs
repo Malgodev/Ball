@@ -207,10 +207,6 @@ public class BallGameLobby : MonoBehaviour
         try
         {
             lobby = await LobbyService.Instance.QuickJoinLobbyAsync();
-
-            // BallGameMultiplayer.Instance.StartClient();
-
-            LobbyControllerExpired.Instance.SetState(LobbyControllerExpired.EMainMenuStateTmp.Lobby);
         }
         catch (LobbyServiceException e)
         {

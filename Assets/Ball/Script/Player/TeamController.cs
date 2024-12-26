@@ -18,11 +18,12 @@ public class TeamController : NetworkBehaviour
 
     [field: Header("Player")]
     [field: SerializeField] public List<GameObject> PlayerList { get; private set; }
-    [field: SerializeField] public PlayerController ControlledPlayer { get; private set; }
     [field: SerializeField] public PlayerController ClosestPlayerToBall { get; private set; }
 
     [field: Header("User control")]
     [field: SerializeField] public bool IsControlledPlayer { get; private set; }
+    [field: SerializeField] public PlayerController ControlledPlayer { get; private set; }
+
     private UserInput userInput;
 
     private int updateCounter = 0;
@@ -36,29 +37,12 @@ public class TeamController : NetworkBehaviour
         userInput = GetComponent<UserInput>();
     }
 
-    private void Start()
-    {
-        // ball = GameController.Singleton.Ball;
-        // goal == get target goal;
-        formationController.IsTeamOne = IsTeamOne;
-        formationAI.IsTeamOne = IsTeamOne;
-    }
-
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
 
-        // GameController.Singleton.SpawnPlayer(this);
         ball = GameController.Instance.Ball;
-
         this.gameObject.name = "Team" + (IsTeamOne ? "One" : "Two");
-
-        // SetAllTeamPlayer();
-
-        //if (IsControlledPlayer)
-        //{
-        //    SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
-        //}
     }
 
     // Mostly use for set player state
@@ -85,6 +69,59 @@ public class TeamController : NetworkBehaviour
         DelayUpdate();
     }
 
+    private void FixedUpdate()
+    {
+        PlayerController newClosestToBall = ClosestPlayerToBall;
+
+        for (int i = 0; i < PlayerList.Count; i++)
+        {
+            PlayerController playerController = PlayerList[i].GetComponent<PlayerController>();
+
+            if (playerController.Role == EPlayerRole.Goalkeeper)
+            {
+                continue;
+            }
+
+            if (CompareClosestPlayerToBall(newClosestToBall, playerController))
+            {
+                newClosestToBall = playerController;
+            }
+        }
+
+        if (newClosestToBall != ClosestPlayerToBall)
+        {
+            newClosestToBall.textColor = Color.green;
+            if (ClosestPlayerToBall != null)
+            {
+                ClosestPlayerToBall.textColor = Color.white;
+            }
+            ClosestPlayerToBall = newClosestToBall;
+        }
+    }
+
+    private void ControlPlayer()
+    {
+        if (ControlledPlayer == null)
+        {
+            return;
+        }
+
+        switch (userInput.InputState)
+        {
+            case EPlayerState.Run:
+                ControlledPlayer.MoveByAxis(userInput.InputVector);
+                break;
+            case EPlayerState.Shot:
+                ControlledPlayer.ShotBall(ball);
+                userInput.InputState = EPlayerState.Run;
+                break;
+            case EPlayerState.Pass:
+                ControlledPlayer.PassBall(ball);
+                userInput.InputState = EPlayerState.Run;
+                break;
+        }
+    }
+
     private void DelayUpdate()
     {
         // Set player logic
@@ -107,32 +144,11 @@ public class TeamController : NetworkBehaviour
 
         // Set controlled player
         SetControlledPlayer();
-
-    }
-
-    private void ControlPlayer()
-    {
-        if (ControlledPlayer == null)
-        {
-            Debug.Log("Some where is wrong");
-            return;
-        }
-
-        switch (userInput.InputState)
-        {
-            case EPlayerState.Run:
-                ControlledPlayer.MoveByAxis(userInput.InputVector);
-                break;
-            case EPlayerState.Shot:
-                ControlledPlayer.ShotBall(ball);
-                userInput.InputState = EPlayerState.Run;
-                break;
-        }
-
     }
 
     private void SetControlledPlayer()
     {
+        // TODO Change to control to closest player to ball
         if (IsControlledPlayer)
         {
             SetControlledPlayer(PlayerList[PlayerList.Count - 1].GetComponent<PlayerController>());
@@ -149,7 +165,6 @@ public class TeamController : NetworkBehaviour
 
         if (playerController == playerHasBall)
         {
-            // Here to, change singleton to get distance from current goal
             if (PossessionRate >= 0.9f && GameController.Instance.GetDistanceToGoal(IsTeamOne, playerController) < 10f)
             {
                 playerController.SetPlayerState(EPlayerState.Shot);
@@ -175,44 +190,6 @@ public class TeamController : NetworkBehaviour
         {
             playerController.SetPlayerState(EPlayerState.Run);
         }
-    }
-
-
-    // Set other player field
-    private void FixedUpdate()
-    {
-        PlayerController newClosestToBall = ClosestPlayerToBall;
-
-        for (int i = 0; i < PlayerList.Count; i++)
-        {
-            PlayerController playerController = PlayerList[i].GetComponent<PlayerController>();
-
-            if (playerController.Role == EPlayerRole.Goalkeeper)
-            {
-                continue;
-            }
-
-            if (CompareClosestPlayerToBall(newClosestToBall, playerController))
-            {
-                newClosestToBall = playerController;
-            }
-        }
-
-        if (newClosestToBall != ClosestPlayerToBall)
-        {
-            ClosestPlayerToBall = newClosestToBall;
-        }
-
-#if UNITY_EDITOR
-        if (newClosestToBall != ClosestPlayerToBall)
-        {
-            newClosestToBall.textColor = Color.green;
-            if (ClosestPlayerToBall != null)
-            {
-                ClosestPlayerToBall.textColor = Color.white;
-            }
-        }
-#endif
     }
 
     private bool CompareClosestPlayerToBall(PlayerController currentPlayer, PlayerController targetPlayer)
@@ -247,10 +224,9 @@ public class TeamController : NetworkBehaviour
 
         formationController.InitFormationControllerClientRpc(IsTeamOne);
         formationAI.InitFormationAIClientRpc(IsTeamOne);
-        // formationController.
+        userInput.SetUserInput();
     }
 
-    // FIX Cái này luôn được check xem có player nào gần bóng nhất -> set player điều khiển cái đấy
     public void SetControlledPlayer(PlayerController player)
     {
         if (ControlledPlayer != null)

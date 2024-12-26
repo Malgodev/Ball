@@ -16,7 +16,6 @@ public class FormationController : NetworkBehaviour
         formationRectangle = this.transform;
     }
 
-    // TODO make this sync on every client
     [ClientRpc]
     public void InitFormationControllerClientRpc(bool isTeamOne)
     {

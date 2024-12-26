@@ -178,8 +178,6 @@ public class FormationAI : NetworkBehaviour
 
     private void UpdatePossessionBalance()
     {
-        // TODO Put this into switch case of ETeamState
-
         ETeamHasBall teamHasBall = GameController.Instance.GetTeamHasBall();
 
         if (teamHasBall == ETeamHasBall.None)
