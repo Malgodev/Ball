@@ -6,7 +6,7 @@ public class BallPlayerInfo : MonoBehaviour
 
     private string playerId;
     [field: SerializeField] public string PlayerName { get; private set; }
-    [field: SerializeField] public int playerElo { get; private set; }
+    [field: SerializeField] public int PlayerElo { get; private set; }
 
     private void Awake()
     {
@@ -29,6 +29,6 @@ public class BallPlayerInfo : MonoBehaviour
             PlayerName += (char)('A' + randomIndex);
         }
 
-        playerElo = Random.Range(0, 1000000);
+        PlayerElo = Random.Range(0, 1000000);
     }
 }

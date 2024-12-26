@@ -75,7 +75,7 @@ public class BallGameLobby : MonoBehaviour
         try
         {
             string playerName = BallPlayerInfo.Instance.PlayerName;
-            string playerElo = BallPlayerInfo.Instance.playerElo.ToString();
+            string playerElo = BallPlayerInfo.Instance.PlayerElo.ToString();
 
             CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions
             {
@@ -141,7 +141,7 @@ public class BallGameLobby : MonoBehaviour
         try
         {
             string playerName = BallPlayerInfo.Instance.PlayerName;
-            string playerElo = BallPlayerInfo.Instance.playerElo.ToString();
+            string playerElo = BallPlayerInfo.Instance.PlayerElo.ToString();
 
             JoinLobbyByIdOptions joinLobbyByIdOptions = new JoinLobbyByIdOptions
             {

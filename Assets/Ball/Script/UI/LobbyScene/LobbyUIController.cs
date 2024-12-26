@@ -4,7 +4,8 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class LobbyUIController : NetworkBehaviour
+
+public class LobbyUIController : MonoBehaviour
 {
     [Header("Lobby Info")]
     // TODO Change the textfield to inputfield => user can customize room name.
@@ -28,7 +29,19 @@ public class LobbyUIController : NetworkBehaviour
     private void Start()
     {
         roomName.text = BallPlayerInfo.Instance.PlayerName;
+
+        readyBtn.onClick.AddListener(() =>
+        {
+            LobbyMultiplayerManager.Instance.SetLocalPlayerReadyServerRpc(BallPlayerInfo.Instance.PlayerName);
+        });
     }
 
+    public void SetPlayerInfoUI(LobbyPlayerInfo playerOne, LobbyPlayerInfo playerTwo)
+    {
+        playerOneInfoTxt.text = playerOne.PlayerName;
+        playerOneIsReadyTxt.text = playerOne.IsPlayerReady ? "Ready" : "Not ready";
 
+        playerTwoInfoTxt.text = playerTwo.PlayerName;
+        playerTwoIsReadyTxt.text = playerTwo.IsPlayerReady ? "Ready" : "Not ready";
+    }
 }

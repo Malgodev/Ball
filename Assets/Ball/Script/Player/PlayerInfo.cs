@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public struct PlayerInfo : IEquatable<UserData>, INetworkSerializable
+public struct PlayerInfo : IEquatable<PlayerInfo>, INetworkSerializable
 {
     public string PlayerName;
     public EPlayerRole Role;
     public Vector2 Offset;
 
-    public bool Equals(UserData other)
+    public bool Equals(PlayerInfo other)
     {
         return PlayerName == other.PlayerName;
     }
